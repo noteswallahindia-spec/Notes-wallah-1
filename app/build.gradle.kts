@@ -145,6 +145,7 @@ val syncWebAssets = tasks.register<Copy>("syncWebAssets") {
     include("css/**")
     include("js/**")
     include("assets/**")
+    include("admin/**")
   }
   into("src/main/assets")
 }

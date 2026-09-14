@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if requesting user has admin privileges
+    function isAdmin() {
+      return request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Student user profiles: Users can manage their own profile, Admins can inspect/manage
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Academic Syllabus collections: Read-only for all students, Write protected for admins
+    match /classes/{classId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /chapters/{chapterId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /ebooks/{ebookId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Pro Notes metadata: Students can read active pro notes; only admins can write/delete
+    match /pro_notes/{noteId} {
+      allow read: if resource.data.is_active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Tests & Challenges: Read allowed, modification reserved for faculty/admin
+    match /tests/{testId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /challenges/{challengeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

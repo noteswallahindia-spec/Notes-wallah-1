@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Notes Wallah - Admin Content Management</title>
+  <meta name="theme-color" content="#132242">
+
+  <!-- Admin Stylesheet -->
+  <link rel="stylesheet" href="admin.css">
+
+  <!-- Firebase Web SDK (Compat libraries) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+
+  <!-- Top Admin Navigation Bar -->
+  <header class="admin-navbar">
+    <a href="../index.html" class="admin-nav-brand">
+      <img src="../assets/logo.png" alt="Notes Wallah Logo" class="admin-nav-logo" onerror="this.onerror=null;this.src='../assets/logo.svg';">
+      <div class="admin-nav-title">NOTES <span>WALLAH</span> <span class="admin-nav-badge">Admin CMS</span></div>
+    </a>
+    <div class="admin-nav-actions">
+      <span id="admin-fb-status-badge" style="font-size:0.75rem; font-weight:600; color:var(--admin-warning);">Standby Mode</span>
+      <a href="../index.html" class="admin-btn-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>Student App</span>
+      </a>
+      <div class="admin-user-pill" id="admin-user-pill-wrap">
+        <div class="admin-avatar" id="admin-user-avatar">A</div>
+        <span id="admin-user-email-display" style="color:#FFFFFF; font-weight:500;">Admin</span>
+        <button type="button" id="btn-admin-logout" style="background:none; border:none; color:var(--admin-gold); cursor:pointer; font-size:0.78rem; margin-left:4px;" title="Sign out">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-container">
+
+    <!-- ====================================================================
+         1. AUTH GATEWAY VIEW (Protected Admin Login)
+         ==================================================================== -->
+    <div id="admin-auth-view" style="display: none;">
+      <div class="admin-auth-card">
+        <div class="admin-auth-header">
+          <img src="../assets/logo.png" alt="Notes Wallah" style="width:48px; height:48px;" onerror="this.onerror=null;this.src='../assets/logo.svg';">
+          <h2 class="admin-auth-title">Admin Console Access</h2>
+          <p class="admin-auth-desc">Sign in with administrative credentials to manage syllabus, NCERT links, and Pro Notes.</p>
+        </div>
+
+        <form id="admin-login-form">
+          <div class="form-field">
+            <label for="admin-email">Admin Email <span class="required">*</span></label>
+            <input type="email" id="admin-email" class="form-input" placeholder="admin@noteswallah.edu" required autocomplete="email">
+          </div>
+
+          <div class="form-field">
+            <label for="admin-password">Password <span class="required">*</span></label>
+            <input type="password" id="admin-password" class="form-input" placeholder="Enter administrative password" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" id="admin-login-submit-btn" class="btn btn-primary" style="width:100%; margin-top:10px;">
+            Sign In as Admin
+          </button>
+        </form>
+
+        <div style="text-align:center; margin: 20px 0 14px 0; color:var(--admin-text-secondary); font-size:0.8rem;">
+          DEVELOPMENT / STANDBY TESTING
+        </div>
+
+        <button type="button" id="btn-dev-admin-pass" class="btn btn-secondary" style="width:100%; font-size:0.85rem;">
+          Instant Admin Access (Development Mode)
+        </button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         2. AUTHENTICATED ADMIN CONSOLE
+         ==================================================================== -->
+    <div id="admin-app-view">
+
+      <!-- Metrics Overview -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div>
+            <div class="metric-val" id="metric-classes">4</div>
+            <div class="metric-label">Academic Classes</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="metric-val" id="metric-subjects">16</div>
+            <div class="metric-label">NCERT Subjects</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+          <div>
+            <div class="metric-val" id="metric-chapters">36</div>
+            <div class="metric-label">Syllabus Chapters</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap" style="background:#ECFDF5; color:var(--admin-success);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="metric-val" id="metric-notes">6</div>
+            <div class="metric-label" id="metric-active-notes">Pro Notes (Active)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Tabs -->
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab-btn active" data-tab="upload">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Upload Pro Note</span>
+        </button>
+        <button type="button" class="admin-tab-btn" data-tab="notes">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Manage Pro Notes</span>
+        </button>
+        <button type="button" class="admin-tab-btn" data-tab="syllabus">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>Manage Syllabus</span>
+        </button>
+        <button type="button" class="admin-tab-btn" data-tab="security">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Security Rules</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: UPLOAD PRO NOTE -->
+      <div id="tab-upload" class="admin-tab-panel">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Upload Chapter Pro Note (PDF)</span>
+            </h3>
+            <span style="font-size:0.75rem; color:var(--admin-text-secondary);">Controlled by Firestore metadata + Firebase Storage</span>
+          </div>
+          <div class="admin-card-body">
+            <form id="form-upload-pro-note">
+
+              <!-- Step 1: Cascading Hierarchy -->
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="upload-select-class">1. Target Class <span class="required">*</span></label>
+                  <select id="upload-select-class" class="form-select" required>
+                    <option value="">-- Loading Classes --</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="upload-select-subject">2. Target Subject <span class="required">*</span></label>
+                  <select id="upload-select-subject" class="form-select" required>
+                    <option value="">-- Select Class First --</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="upload-select-chapter">3. Target Chapter <span class="required">*</span></label>
+                  <select id="upload-select-chapter" class="form-select" required>
+                    <option value="">-- Select Subject First --</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Step 2: Note Details -->
+              <div class="form-row">
+                <div class="form-field" style="grid-column: 1 / -1;">
+                  <label for="upload-note-title">Note Title <span class="required">*</span></label>
+                  <input type="text" id="upload-note-title" class="form-input" placeholder="e.g. Chemical Reactions & Equations - Premium Faculty Summary Notes" required>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="upload-note-desc">Description / Key Highlights</label>
+                <textarea id="upload-note-desc" class="form-textarea" placeholder="Comprehensive faculty notes containing reaction balances, color indicators, NCERT exemplar problem solutions and board tips."></textarea>
+              </div>
+
+              <!-- Step 3: PDF File Selection -->
+              <div class="form-field">
+                <label>PDF Document File <span class="required">*</span></label>
+                <input type="file" id="upload-pdf-file" accept="application/pdf,.pdf" style="display:none;">
+
+                <div class="pdf-upload-dropzone" id="pdf-dropzone">
+                  <div class="pdf-dropzone-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                  </div>
+                  <strong style="display:block; font-size:0.95rem; color:var(--admin-navy);">Click to select PDF or drag & drop here</strong>
+                  <span class="form-hint">Accepted format: PDF only. Maximum file size: 50MB.</span>
+                </div>
+
+                <div class="pdf-file-info" id="pdf-file-info">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--admin-navy)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <div>
+                      <strong id="pdf-file-name" style="display:block; font-size:0.88rem;">filename.pdf</strong>
+                      <span id="pdf-file-size" style="font-size:0.75rem; color:var(--admin-text-secondary);">0 MB</span>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-remove-pdf">Change File</button>
+                </div>
+
+                <!-- Resumable Upload Progress Bar -->
+                <div class="upload-progress-container" id="upload-progress-container">
+                  <div class="progress-header">
+                    <span id="upload-progress-text">Uploading PDF: 0%</span>
+                    <span style="color:var(--admin-gold); font-size:0.75rem; font-weight:600;">Firebase Storage</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-bar" id="upload-progress-bar"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
+                <button type="reset" class="btn btn-secondary">Reset Form</button>
+                <button type="submit" id="btn-submit-pro-note" class="btn btn-gold">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Publish Pro Note</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: MANAGE PRO NOTES TABLE -->
+      <div id="tab-notes" class="admin-tab-panel" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Uploaded Pro Notes Catalog</span>
+            </h3>
+          </div>
+          <div class="admin-card-body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title & File</th>
+                    <th>Class</th>
+                    <th>Subject ID</th>
+                    <th>Chapter ID</th>
+                    <th>Size</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pro-notes-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="pro-notes-table-empty" style="display:none; text-align:center; padding:40px 20px;">
+              <p style="color:var(--admin-text-secondary); font-size:0.9rem;">No Pro Notes found. Upload your first PDF above.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: SYLLABUS MANAGEMENT -->
+      <div id="tab-syllabus" class="admin-tab-panel" style="display:none;">
+        
+        <!-- Push to live Firestore card -->
+        <div class="admin-card" style="border-left: 4px solid var(--admin-gold);">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--admin-gold)" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Sync NCERT Syllabus into Connected Firestore</span>
+            </h3>
+          </div>
+          <div class="admin-card-body">
+            <p style="font-size:0.88rem; color:var(--admin-text-secondary); margin-bottom:14px;">
+              Pushes all 36 verified NCERT chapters (Classes 9–12 Science, Math, Social Science, Physics, Chemistry, Biology) and official NCERT portal URLs into your connected Firestore database.
+            </p>
+            <button type="button" id="btn-sync-syllabus-firestore" class="btn btn-gold">
+              Sync NCERT Syllabus to Firestore
+            </button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+          
+          <!-- Add Subject -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h4 class="admin-card-title">Add NCERT Subject</h4>
+            </div>
+            <div class="admin-card-body">
+              <form id="form-add-subject">
+                <div class="form-field">
+                  <label for="add-subject-class">Class <span class="required">*</span></label>
+                  <select id="add-subject-class" class="form-select" required>
+                    <option value="class_9">Class 9</option>
+                    <option value="class_10" selected>Class 10</option>
+                    <option value="class_11">Class 11</option>
+                    <option value="class_12">Class 12</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="add-subject-name">Subject Name <span class="required">*</span></label>
+                  <input type="text" id="add-subject-name" class="form-input" placeholder="e.g. Science" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Create Subject</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Add Chapter with NCERT Ebook Link -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h4 class="admin-card-title">Add Chapter & Official Ebook Link</h4>
+            </div>
+            <div class="admin-card-body">
+              <form id="form-add-chapter">
+                <div class="form-field">
+                  <label for="add-chapter-class">Class <span class="required">*</span></label>
+                  <select id="add-chapter-class" class="form-select" required>
+                    <option value="class_10" selected>Class 10</option>
+                    <option value="class_9">Class 9</option>
+                    <option value="class_11">Class 11</option>
+                    <option value="class_12">Class 12</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="add-chapter-subject">Subject ID <span class="required">*</span></label>
+                  <input type="text" id="add-chapter-subject" class="form-input" placeholder="e.g. class_10_science" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label for="add-chapter-num">Chapter #</label>
+                    <input type="number" id="add-chapter-num" class="form-input" value="1" min="1">
+                  </div>
+                  <div class="form-field" style="grid-column: 2 / -1;">
+                    <label for="add-chapter-name">Chapter Name <span class="required">*</span></label>
+                    <input type="text" id="add-chapter-name" class="form-input" placeholder="e.g. Life Processes" required>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="add-chapter-ebook-url">Official NCERT Portal URL</label>
+                  <input type="url" id="add-chapter-ebook-url" class="form-input" placeholder="https://ncert.nic.in/textbook.php?jesc1=6-16">
+                  <span class="form-hint">Official NCERT website link. Opened directly without re-hosting.</span>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Save Chapter & Ebook</button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 4: FIREBASE SECURITY RULES -->
+      <div id="tab-security" class="admin-tab-panel" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>Production Firebase Security Rules</span>
+            </h3>
+          </div>
+          <div class="admin-card-body">
+            <p style="font-size:0.88rem; color:var(--admin-text-secondary); margin-bottom:14px;">
+              Copy these rules directly into your Firebase Console. They ensure that students can read syllabus and active pro notes, but only users with <code>role == 'admin'</code> can upload PDFs, create chapters, or modify metadata.
+            </p>
+
+            <h4 style="font-size:0.95rem; margin:16px 0 6px 0;">1. Cloud Firestore Rules (firestore.rules)</h4>
+            <div class="code-box">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user has admin role
+    function isAdmin() {
+      return request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Student user profiles: Users can read and write their own profile
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Syllabus hierarchy: Public read, Admin write
+    match /classes/{classId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /chapters/{chapterId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /ebooks/{ebookId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Pro Notes metadata: Public read of active notes, Admin-only write
+    match /pro_notes/{noteId} {
+      allow read: if resource.data.is_active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+  }
+}
+            </div>
+
+            <h4 style="font-size:0.95rem; margin:20px 0 6px 0;">2. Firebase Storage Rules (storage.rules)</h4>
+            <div class="code-box">
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper to check admin role via custom token or firestore
+    function isAdmin() {
+      return request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    // Student avatar pictures: Read public, Write own avatar
+    match /avatars/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Pro Notes: Predictable path pro_notes/{class_id}/{subject_id}/{chapter_id}/{note_id}/{file_name}
+    // Only authenticated admins can upload PDF files
+    match /pro_notes/{classId}/{subjectId}/{chapterId}/{noteId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null 
+                    && request.resource.contentType == 'application/pdf'
+                    && request.resource.size <= 50 * 1024 * 1024;
+    }
+  }
+}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Application Logic Modules -->
+  <script src="../js/firebase.js"></script>
+  <script src="../js/database.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="admin.js"></script>
+
+</body>
+</html>

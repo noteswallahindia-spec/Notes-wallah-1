@@ -74,6 +74,33 @@ class AuthService {
   }
 
   /**
+   * Initialize Firebase Auth listener for real session restore
+   */
+  initFirebaseAuthObserver() {
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.auth) {
+      fb.auth.onAuthStateChanged(async (fbUser) => {
+        if (fbUser) {
+          try {
+            let profile = await window.NotesWallahDatabase.getUserProfile(fbUser.uid);
+            const user = {
+              uid: fbUser.uid,
+              email: fbUser.email,
+              name: profile ? profile.name : fbUser.displayName || fbUser.email.split("@")[0],
+              role: profile ? (profile.role || "student") : "student",
+              isOnboarded: !!(profile && (profile.classLevel || profile.class_id)),
+              profile: profile || {}
+            };
+            this.saveSession(user);
+          } catch (e) {
+            console.warn("[AuthService] Error fetching profile on auth change:", e);
+          }
+        }
+      });
+    }
+  }
+
+  /**
    * Register listener for auth state changes
    */
   onAuthStateChanged(callback) {

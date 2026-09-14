@@ -95,6 +95,14 @@ class AppRouter {
 
     this.currentTab = tabId;
 
+    // Academic study system initialization trigger
+    if (tabId === "study" && window.NotesWallahStudy) {
+      if (!window.NotesWallahStudy.currentClassId) {
+        const currentUser = window.NotesWallahAuth ? window.NotesWallahAuth.getCurrentUser() : null;
+        window.NotesWallahStudy.init(currentUser);
+      }
+    }
+
     // Scroll viewport to top
     const viewport = document.querySelector(".app-content-viewport");
     if (viewport) viewport.scrollTop = 0;

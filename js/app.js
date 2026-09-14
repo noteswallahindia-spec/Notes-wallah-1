@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 1. Initialize Ad Service & Firebase Architecture
   await firebaseService.initialize();
+  auth.initFirebaseAuthObserver();
   await adService.init();
 
   // 2. Bind Navigation Tab Clicks

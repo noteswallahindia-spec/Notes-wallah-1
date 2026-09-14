@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 1. Initialize Ad Service & Firebase Architecture
   await firebaseService.initialize();
+  auth.initFirebaseAuthObserver();
   await adService.init();
 
   // 2. Bind Navigation Tab Clicks
@@ -63,6 +64,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else if (!user.isOnboarded) {
         router.navigate("onboarding", null, false);
       } else {
+        if (window.NotesWallahStudy) {
+          window.NotesWallahStudy.init(user);
+        }
         router.navigate("main", "home", false);
       }
     }, 1100);
@@ -80,8 +84,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (user) {
       const displayName = user.name || (user.email ? user.email.split("@")[0] : "Student");
-      const userClass = (user.profile && user.profile.classLevel) || "Class not selected";
-      const userBoard = (user.profile && user.profile.board) || "Board not set";
+      const userClass = (user.profile && user.profile.classLevel) || "Class 10";
+      const userBoard = (user.profile && user.profile.board) || "CBSE";
       const userMedium = (user.profile && user.profile.medium) || "English Medium";
       const userLang = (user.profile && user.profile.preferredLanguage) || "English";
 
@@ -97,8 +101,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } else {
       studentNameDisplays.forEach(el => el.textContent = "Student");
-      studentClassDisplays.forEach(el => el.textContent = "Select Class");
-      studentBoardDisplays.forEach(el => el.textContent = "Board");
+      studentClassDisplays.forEach(el => el.textContent = "Class 10");
+      studentBoardDisplays.forEach(el => el.textContent = "CBSE");
     }
   }
 
@@ -118,6 +122,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!user.isOnboarded) {
           router.navigate("onboarding");
         } else {
+          if (window.NotesWallahStudy) {
+            window.NotesWallahStudy.init(user);
+          }
           router.navigate("main", "home");
         }
       } catch (err) {
@@ -281,12 +288,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentUser.profile = studentProfile;
         auth.saveSession(currentUser);
 
+        if (window.NotesWallahStudy) {
+          window.NotesWallahStudy.init(currentUser);
+        }
+
         ui.showToast("Profile set up successfully! Welcome to Notes Wallah.", "success");
         router.navigate("main", "home");
       } catch (err) {
         ui.showToast("Could not save profile: " + err.message, "error");
       } finally {
         ui.setButtonLoading(submitBtn, false, "Complete Setup");
+      }
+    });
+  }
+
+  // Account switch class button listener
+  const btnAccountChangeClass = document.getElementById("btn-account-change-class");
+  if (btnAccountChangeClass) {
+    btnAccountChangeClass.addEventListener("click", () => {
+      if (window.NotesWallahStudy) {
+        window.NotesWallahStudy.openClassSwitcher();
       }
     });
   }

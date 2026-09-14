@@ -259,17 +259,17 @@ class DatabaseService {
     const sanitizedData = {
       uid: uid,
       name: profileData.name ? profileData.name.trim() : "",
+      email: profileData.email || "",
+      photo_url: profileData.photo_url || null,
       class_id: classId,
       classLevel: className,
       board: profileData.board || "CBSE",
       medium: profileData.medium || "English",
+      role: profileData.role || "student", // default: student, or admin
       preferredLanguage: profileData.preferredLanguage || "English",
-      updatedAt: new Date().toISOString()
+      created_at: profileData.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
-
-    if (profileData.email) {
-      sanitizedData.email = profileData.email;
-    }
 
     // 1. Save to local cache
     try {
@@ -563,6 +563,302 @@ class DatabaseService {
     return {
       hasEbook: !!(ebook && ebook.ebook_url),
       hasProNotes: !!(proNotes && proNotes.storage_path)
+    };
+  }
+
+  /**
+   * Check if a student user has administrative role
+   */
+  async checkIsAdmin(uid) {
+    if (!uid) return false;
+    const profile = await this.getUserProfile(uid);
+    return !!(profile && profile.role === "admin");
+  }
+
+  // ==========================================================================
+  // ADMIN CONTENT MANAGEMENT CRUD OPERATIONS
+  // ==========================================================================
+
+  /**
+   * Save or update Pro Note metadata in Firestore and local store
+   * pro_notes/{noteId}
+   */
+  async saveProNoteMetadata(noteData) {
+    if (!noteData || !noteData.id) {
+      throw new Error("Pro Note ID is required.");
+    }
+
+    const cleanNote = {
+      id: noteData.id,
+      class_id: this.normalizeClassId(noteData.class_id),
+      subject_id: noteData.subject_id,
+      chapter_id: noteData.chapter_id,
+      title: (noteData.title || "").trim(),
+      description: (noteData.description || "").trim(),
+      storage_path: noteData.storage_path || "",
+      download_url: noteData.download_url || "",
+      thumbnail_url: noteData.thumbnail_url || "",
+      file_name: noteData.file_name || "notes.pdf",
+      file_size: Number(noteData.file_size) || 0,
+      is_active: noteData.is_active !== false,
+      created_at: noteData.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    // Update in-memory seed list
+    const existingIndex = this.seedProNotes.findIndex(p => p.id === cleanNote.id);
+    if (existingIndex >= 0) {
+      this.seedProNotes[existingIndex] = cleanNote;
+    } else {
+      this.seedProNotes.push(cleanNote);
+    }
+
+    // Persist to Firestore if configured
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore
+          .collection(this.COLLECTION_PRO_NOTES)
+          .doc(cleanNote.id)
+          .set(cleanNote, { merge: true });
+        console.info("[DatabaseService] Pro Note metadata saved to Firestore:", cleanNote.id);
+      } catch (err) {
+        console.error("[DatabaseService] Firestore pro_notes save error:", err);
+        throw new Error("Unable to save note metadata to Firestore: " + err.message);
+      }
+    }
+
+    // Update local storage backup
+    try {
+      localStorage.setItem("nw_custom_pro_notes", JSON.stringify(this.seedProNotes));
+    } catch (e) {
+      console.warn("Local storage write error for pro notes:", e);
+    }
+
+    return cleanNote;
+  }
+
+  /**
+   * Fetch all Pro Notes across all classes for Admin table
+   */
+  async getAllProNotes() {
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        const snapshot = await fb.firestore
+          .collection(this.COLLECTION_PRO_NOTES)
+          .get();
+
+        if (!snapshot.empty) {
+          const notes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // Merge with custom notes in local cache if any
+          return notes;
+        }
+      } catch (err) {
+        console.warn("[DatabaseService] Firestore getAllProNotes query error, fallback to seed:", err);
+      }
+    }
+
+    // Load any persisted custom pro notes
+    try {
+      const stored = localStorage.getItem("nw_custom_pro_notes");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+
+    return [...this.seedProNotes];
+  }
+
+  /**
+   * Toggle Pro Note active status (is_active)
+   */
+  async updateProNoteStatus(noteId, isActive) {
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore
+          .collection(this.COLLECTION_PRO_NOTES)
+          .doc(noteId)
+          .update({ is_active: isActive, updated_at: new Date().toISOString() });
+      } catch (err) {
+        console.error("[DatabaseService] Error updating pro note status:", err);
+      }
+    }
+
+    const note = this.seedProNotes.find(p => p.id === noteId);
+    if (note) {
+      note.is_active = isActive;
+      note.updated_at = new Date().toISOString();
+      try {
+        localStorage.setItem("nw_custom_pro_notes", JSON.stringify(this.seedProNotes));
+      } catch (e) {}
+    }
+    return true;
+  }
+
+  /**
+   * Delete Pro Note metadata and reference
+   */
+  async deleteProNote(noteId) {
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore
+          .collection(this.COLLECTION_PRO_NOTES)
+          .doc(noteId)
+          .delete();
+      } catch (err) {
+        console.error("[DatabaseService] Error deleting pro note doc:", err);
+      }
+    }
+
+    this.seedProNotes = this.seedProNotes.filter(p => p.id !== noteId);
+    try {
+      localStorage.setItem("nw_custom_pro_notes", JSON.stringify(this.seedProNotes));
+    } catch (e) {}
+    return true;
+  }
+
+  /**
+   * Admin: Create or update Class
+   */
+  async createClass(classData) {
+    const classId = this.normalizeClassId(classData.id || classData.name);
+    const docData = {
+      id: classId,
+      name: (classData.name || this.formatClassName(classId)).trim(),
+      display_order: Number(classData.display_order) || 10,
+      board: classData.board || "CBSE",
+      medium: classData.medium || "English",
+      is_active: classData.is_active !== false,
+      created_at: new Date().toISOString()
+    };
+
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      await fb.firestore.collection(this.COLLECTION_CLASSES).doc(classId).set(docData, { merge: true });
+    }
+
+    const idx = this.seedClasses.findIndex(c => c.id === classId);
+    if (idx >= 0) this.seedClasses[idx] = docData;
+    else this.seedClasses.push(docData);
+
+    return docData;
+  }
+
+  /**
+   * Admin: Create or update Subject under a Class
+   */
+  async createSubject(subjectData) {
+    const classId = this.normalizeClassId(subjectData.class_id);
+    const subjectId = subjectData.id || `${classId}_${(subjectData.name || "").toLowerCase().replace(/[^a-z0-9]/g, "_")}`;
+    const docData = {
+      id: subjectId,
+      class_id: classId,
+      name: (subjectData.name || "").trim(),
+      display_order: Number(subjectData.display_order) || 1,
+      icon: subjectData.icon || "science",
+      is_active: subjectData.is_active !== false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      await fb.firestore.collection(this.COLLECTION_SUBJECTS).doc(subjectId).set(docData, { merge: true });
+    }
+
+    const idx = this.seedSubjects.findIndex(s => s.id === subjectId);
+    if (idx >= 0) this.seedSubjects[idx] = docData;
+    else this.seedSubjects.push(docData);
+
+    return docData;
+  }
+
+  /**
+   * Admin: Create or update Chapter under a Subject
+   */
+  async createChapter(chapterData) {
+    const classId = this.normalizeClassId(chapterData.class_id);
+    const subjectId = chapterData.subject_id;
+    const chNum = Number(chapterData.chapter_number) || 1;
+    const chapterId = chapterData.id || `${subjectId}_ch${chNum}`;
+
+    const docData = {
+      id: chapterId,
+      class_id: classId,
+      subject_id: subjectId,
+      chapter_number: chNum,
+      chapter_name: (chapterData.chapter_name || "").trim(),
+      display_order: chNum,
+      is_active: chapterData.is_active !== false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      await fb.firestore.collection(this.COLLECTION_CHAPTERS).doc(chapterId).set(docData, { merge: true });
+    }
+
+    const idx = this.seedChapters.findIndex(c => c.id === chapterId);
+    if (idx >= 0) this.seedChapters[idx] = docData;
+    else this.seedChapters.push(docData);
+
+    return docData;
+  }
+
+  /**
+   * Admin: Save NCERT Ebook link for a Chapter
+   */
+  async saveEbookMetadata(ebookData) {
+    const classId = this.normalizeClassId(ebookData.class_id);
+    const ebookId = ebookData.id || `${ebookData.chapter_id}_ebook`;
+
+    const docData = {
+      id: ebookId,
+      class_id: classId,
+      subject_id: ebookData.subject_id,
+      chapter_id: ebookData.chapter_id,
+      title: ebookData.title || "Official NCERT Chapter Ebook",
+      ebook_url: ebookData.ebook_url || "",
+      is_active: ebookData.is_active !== false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      await fb.firestore.collection(this.COLLECTION_EBOOKS).doc(ebookId).set(docData, { merge: true });
+    }
+
+    const idx = this.seedEbooks.findIndex(e => e.id === ebookId);
+    if (idx >= 0) this.seedEbooks[idx] = docData;
+    else this.seedEbooks.push(docData);
+
+    return docData;
+  }
+
+  /**
+   * Admin: Aggregate statistics for the dashboard
+   */
+  async getAdminStats() {
+    const allNotes = await this.getAllProNotes();
+    const activeNotes = allNotes.filter(n => n.is_active).length;
+
+    return {
+      totalClasses: this.seedClasses.length,
+      totalSubjects: this.seedSubjects.length,
+      totalChapters: this.seedChapters.length,
+      totalProNotes: allNotes.length,
+      activeProNotes: activeNotes,
+      totalEbooks: this.seedEbooks.length
     };
   }
 

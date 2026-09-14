@@ -94,11 +94,32 @@ class FirebaseService {
     }
 
     // Safe Development / Standby Mode:
-    // Ensures Part 1 UI, onboarding, and navigation are 100% testable without breaking
+    // Ensures Part 1 & 2 UI, onboarding, and navigation are 100% testable without breaking
     this.isInitialized = true;
     this.isDemoMode = true;
     console.info("[NotesWallah Firebase] Initialized in Safe Foundation Mode. (Ready for your Firebase Project Keys)");
     return { success: true, mode: "safe_foundation" };
+  }
+
+  getAuth() {
+    return this.auth;
+  }
+
+  getFirestore() {
+    return this.firestore;
+  }
+
+  getStorage() {
+    return this.storage;
+  }
+
+  getStatus() {
+    return {
+      isInitialized: this.isInitialized,
+      isConfigured: this.isConfigured(),
+      projectId: this.config ? this.config.projectId : null,
+      mode: this.isDemoMode ? "safe_foundation" : "production"
+    };
   }
 }
 
