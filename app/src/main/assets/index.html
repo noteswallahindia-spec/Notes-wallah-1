@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Notes Wallah - Educational Platform</title>
+  <meta name="theme-color" content="#132242">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Notes Wallah - Premium Educational Application for Indian Students">
+
+  <!-- Core Theme & Stylesheets -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Firebase Web SDK (Compat libraries for maximum mobile browser compatibility) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- ====================================================================
+         1. SPLASH SCREEN
+         ==================================================================== -->
+    <div id="view-splash" class="app-view active">
+      <div class="splash-content">
+        <div class="splash-logo-wrap">
+          <!-- Official Notes Wallah Logo Container: Replaceable by user at assets/logo.svg / assets/logo.png -->
+          <img src="assets/logo.png" alt="Notes Wallah Logo" class="splash-logo-img" id="official-splash-logo" onerror="this.onerror=null;this.src='assets/logo.svg';">
+        </div>
+        <h1 class="splash-title">NOTES <span>WALLAH</span></h1>
+        <p class="splash-tagline">Quality Education for Every Student</p>
+      </div>
+      <div class="splash-footer">
+        <div class="splash-spinner"></div>
+        <p class="splash-status-text">Starting student session...</p>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         2. LOGIN SCREEN
+         ==================================================================== -->
+    <div id="view-login" class="app-view">
+      <div class="auth-container">
+        <div class="auth-header">
+          <div class="auth-brand-badge">
+            <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>NOTES WALLAH</span>
+          </div>
+          <h2 class="auth-title">Welcome Back</h2>
+          <p class="auth-subtitle">Sign in to continue your preparation & study materials</p>
+        </div>
+
+        <form id="login-form" class="auth-form" autocomplete="on">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" id="login-email" class="form-input" placeholder="student@example.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" class="password-toggle-btn" data-target="login-password" aria-label="Toggle password visibility">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-helper-row">
+            <button type="button" class="text-link" data-open-modal="modal-forgot-password">Forgot Password?</button>
+          </div>
+
+          <button type="submit" id="login-submit-btn" class="btn btn-primary btn-block">
+            Sign In
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <button type="button" class="btn-google">
+          <svg class="google-icon-svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <div class="auth-footer">
+          Don't have an account? <a href="#" class="text-link" data-navigate-view="signup">Create Account</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         3. SIGNUP SCREEN
+         ==================================================================== -->
+    <div id="view-signup" class="app-view">
+      <div class="auth-container">
+        <div class="auth-header">
+          <div class="auth-brand-badge">
+            <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>NEW STUDENT</span>
+          </div>
+          <h2 class="auth-title">Create Account</h2>
+          <p class="auth-subtitle">Join Notes Wallah to unlock notes and practice tests</p>
+        </div>
+
+        <form id="signup-form" class="auth-form" autocomplete="on">
+          <div class="form-group">
+            <label class="form-label" for="signup-name">Full Name</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input type="text" id="signup-name" class="form-input" placeholder="e.g. Aman Sharma" required autocomplete="name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" id="signup-email" class="form-input" placeholder="student@example.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="signup-password" class="form-input" placeholder="At least 6 characters" required autocomplete="new-password">
+              <button type="button" class="password-toggle-btn" data-target="signup-password" aria-label="Toggle password visibility">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-confirm-password">Confirm Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="signup-confirm-password" class="form-input" placeholder="Re-enter password" required autocomplete="new-password">
+            </div>
+          </div>
+
+          <button type="submit" id="signup-submit-btn" class="btn btn-primary btn-block">
+            Create Account
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <button type="button" class="btn-google">
+          <svg class="google-icon-svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <div class="auth-footer">
+          Already have an account? <a href="#" class="text-link" data-navigate-view="login">Log in</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         4. ONBOARDING SCREEN
+         ==================================================================== -->
+    <div id="view-onboarding" class="app-view">
+      <div class="onboarding-container">
+        <div class="onboarding-header">
+          <div class="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot active"></div>
+          </div>
+          <h2 class="onboarding-title">Set Up Your Profile</h2>
+          <p class="onboarding-subtitle">Tell us about your studies to organize your syllabus</p>
+        </div>
+
+        <form id="onboarding-form">
+          <!-- Class Selection -->
+          <div class="form-group" style="margin-bottom: var(--spacing-4);">
+            <label class="form-label">Select Your Class</label>
+            <div class="onboarding-options-grid">
+              <div class="choice-chip class-choice-chip" data-value="Class 9">
+                <span>Class 9</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip class-choice-chip" data-value="Class 10">
+                <span>Class 10</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip class-choice-chip" data-value="Class 11">
+                <span>Class 11</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip class-choice-chip" data-value="Class 12">
+                <span>Class 12</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip class-choice-chip" data-value="Dropper / Competitive" style="grid-column: span 2;">
+                <span>Dropper / Competitive (JEE / NEET)</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Board Selection -->
+          <div class="form-group" style="margin-bottom: var(--spacing-4);">
+            <label class="form-label">Select Your Board</label>
+            <div class="onboarding-options-grid">
+              <div class="choice-chip board-choice-chip" data-value="CBSE">
+                <span>CBSE</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip board-choice-chip" data-value="ICSE / ISC">
+                <span>ICSE / ISC</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip board-choice-chip" data-value="UP Board">
+                <span>UP Board</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip board-choice-chip" data-value="Bihar Board">
+                <span>Bihar Board</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip board-choice-chip" data-value="Other State Board" style="grid-column: span 2;">
+                <span>Other State Board</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Medium & Preferred Language -->
+          <div class="form-group" style="margin-bottom: var(--spacing-4);">
+            <label class="form-label">Medium of Instruction</label>
+            <div class="onboarding-options-grid">
+              <div class="choice-chip medium-choice-chip selected" data-value="English Medium">
+                <span>English Medium</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip medium-choice-chip" data-value="Hindi Medium">
+                <span>Hindi Medium</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--spacing-6);">
+            <label class="form-label">Preferred Study Language</label>
+            <div class="onboarding-options-grid">
+              <div class="choice-chip lang-choice-chip selected" data-value="English">
+                <span>English</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+              <div class="choice-chip lang-choice-chip" data-value="Hindi">
+                <span>Hindi</span>
+                <span class="chip-check"><svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="onboarding-submit-btn" class="btn btn-gold btn-block">
+            Complete Setup & Start Learning
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         5. MAIN APPLICATION SHELL
+         ==================================================================== -->
+    <div id="view-main" class="app-view">
+      <div class="main-app-shell">
+
+        <!-- Top App Bar -->
+        <header class="app-topbar">
+          <div class="app-brand-area">
+            <!-- Official Logo Slot: user can replace with assets/logo.svg / assets/logo.png -->
+            <img src="assets/logo.png" alt="Notes Wallah" class="brand-logo-compact" onerror="this.onerror=null;this.src='assets/logo.svg';">
+          </div>
+          <div class="topbar-actions">
+            <button type="button" id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Dark Mode">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <button type="button" class="icon-btn" aria-label="Notifications" onclick="window.NotesWallahUI.showToast('No new notifications at this time.')">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Scrollable Content Viewport -->
+        <main class="app-content-viewport">
+
+          <!-- --------------------------------------------------------------
+               SCREEN 1: HOME
+               -------------------------------------------------------------- -->
+          <section id="screen-home" class="tab-screen active">
+            <!-- Student Greeting Banner -->
+            <div class="student-greeting-banner">
+              <div class="greeting-text-wrap">
+                <h2>Namaste, <span class="student-name-display">Student</span></h2>
+                <p>Ready to continue your preparation?</p>
+              </div>
+              <div class="student-badges">
+                <span class="academic-badge student-class-display">Class 10</span>
+              </div>
+            </div>
+
+            <!-- Quick Access Grid -->
+            <div class="section-title-row">
+              <h3 class="section-title">Quick Access</h3>
+            </div>
+            <div class="quick-access-grid">
+              <button type="button" class="quick-action-btn" data-navigate-tab="study">
+                <div class="quick-action-icon-wrap">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <span class="quick-action-label">Subjects</span>
+              </button>
+              <button type="button" class="quick-action-btn" data-navigate-tab="test">
+                <div class="quick-action-icon-wrap">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <span class="quick-action-label">Tests</span>
+              </button>
+              <button type="button" class="quick-action-btn" data-navigate-tab="challenges">
+                <div class="quick-action-icon-wrap">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+                </div>
+                <span class="quick-action-label">Challenge</span>
+              </button>
+              <button type="button" class="quick-action-btn" data-navigate-tab="account">
+                <div class="quick-action-icon-wrap">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <span class="quick-action-label">Profile</span>
+              </button>
+            </div>
+
+            <!-- Continue Studying Section (Clean Empty State) -->
+            <div class="section-title-row">
+              <h3 class="section-title">Continue Studying</h3>
+            </div>
+            <div class="empty-state">
+              <div class="empty-state-icon-wrap">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </div>
+              <h4 class="empty-state-title">No Recent Chapters</h4>
+              <p class="empty-state-subtitle">Start reading study material from your class syllabus to track your progress here.</p>
+              <button type="button" class="btn btn-outline" data-navigate-tab="study">Browse Subjects</button>
+            </div>
+
+            <!-- Daily & Weekly Challenge Highlights -->
+            <div class="section-title-row">
+              <h3 class="section-title">Academic Challenges</h3>
+              <a href="#" class="text-link" data-navigate-tab="challenges">View All</a>
+            </div>
+            <div class="feature-card challenge-card">
+              <div class="card-header-row">
+                <span class="card-tag">Daily Challenge</span>
+                <span class="academic-badge student-class-display">Class 10</span>
+              </div>
+              <h4 class="card-title">Daily Practice Problems</h4>
+              <p class="card-desc">Daily conceptual question curated by Notes Wallah faculty for your board exams.</p>
+              <div style="margin-top: var(--spacing-3);">
+                <button type="button" class="btn btn-outline" style="min-height: 38px; padding: 0 14px; font-size: 0.813rem;" data-navigate-tab="challenges">Open Daily Challenge</button>
+              </div>
+            </div>
+
+            <!-- Recommended Study (Prepared for Part 2) -->
+            <div class="section-title-row">
+              <h3 class="section-title">Recommended for You</h3>
+            </div>
+            <div class="empty-state">
+              <div class="empty-state-icon-wrap">
+                <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <h4 class="empty-state-title">Personalized Recommendations</h4>
+              <p class="empty-state-subtitle">Curated chapters, revision formula sheets and video breakdowns will sync in Part 2.</p>
+            </div>
+
+            <!-- Recent Activity (Clean Empty State) -->
+            <div class="section-title-row">
+              <h3 class="section-title">Recent Activity</h3>
+            </div>
+            <div class="empty-state">
+              <h4 class="empty-state-title">No Activity Recorded Yet</h4>
+              <p class="empty-state-subtitle">Completed tests, read notes, and challenge attempts will be logged here.</p>
+            </div>
+
+            <!-- Achievements (Zero XP - Milestone based) -->
+            <div class="section-title-row">
+              <h3 class="section-title">Achievements</h3>
+            </div>
+            <div class="feature-card">
+              <div style="display: flex; gap: var(--spacing-3); align-items: center;">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--brand-gold-subtle); display: flex; align-items: center; justify-content: center; color: var(--brand-gold); flex-shrink: 0;">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 15l-2 5l9-9l-5-2l2-5l-9 9l5 2z"/></svg>
+                </div>
+                <div>
+                  <h4 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-text-primary);">Early Scholar</h4>
+                  <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Joined Notes Wallah platform and initialized study profile</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- --------------------------------------------------------------
+               SCREEN 2: STUDY
+               -------------------------------------------------------------- -->
+          <section id="screen-study" class="tab-screen">
+            <div class="section-title-row">
+              <h3 class="section-title">Academic Study & Notes</h3>
+              <span class="academic-badge student-board-display">CBSE</span>
+            </div>
+
+            <!-- Architecture Notice for Part 2 continuation -->
+            <div class="feature-card" style="border-left: 4px solid var(--brand-navy-primary);">
+              <div class="card-header-row">
+                <span class="card-tag" style="color: var(--brand-navy-primary);">Study Flow Architecture</span>
+              </div>
+              <p class="card-desc" style="font-size: var(--font-size-xs);">
+                <strong>Hierarchy:</strong> Study → Subject → Chapter → Ebook / Pro Notes
+              </p>
+            </div>
+
+            <!-- Pro Notes Ad Gatekeeper Architecture Card -->
+            <div class="pro-notes-banner-card">
+              <div class="pro-badge">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24" style="stroke: #0D1424;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>PRO NOTES FEATURE</span>
+              </div>
+              <h4 class="card-title">Handwritten Pro Notes</h4>
+              <p class="card-desc">
+                High-yield topper notes and revision charts. Unlocked automatically after watching an advertisement. <em>Zero XP required.</em>
+              </p>
+              <div style="margin-top: var(--spacing-3);">
+                <button type="button" class="btn btn-gold btn-open-pro-notes" data-note-id="sample_pro_notes">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <span>Unlock Pro Notes</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Empty State for Subjects (Loaded from Firebase in Part 2) -->
+            <div class="empty-state">
+              <div class="empty-state-icon-wrap">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+              <h4 class="empty-state-title">Academic Syllabus Syncing</h4>
+              <p class="empty-state-subtitle">
+                Subjects for <span class="student-class-display">Class 10</span> (<span class="student-board-display">CBSE</span>) will be loaded directly from Firebase Firestore in Part 2.
+              </p>
+            </div>
+          </section>
+
+          <!-- --------------------------------------------------------------
+               SCREEN 3: TEST
+               -------------------------------------------------------------- -->
+          <section id="screen-test" class="tab-screen">
+            <div class="section-title-row">
+              <h3 class="section-title">Test Series & Practice</h3>
+              <span class="academic-badge student-class-display">Class 10</span>
+            </div>
+
+            <!-- Architecture Notice for Part 3 continuation -->
+            <div class="feature-card" style="border-left: 4px solid var(--brand-navy-primary);">
+              <div class="card-header-row">
+                <span class="card-tag" style="color: var(--brand-navy-primary);">Test Flow Architecture</span>
+              </div>
+              <p class="card-desc" style="font-size: var(--font-size-xs);">
+                <strong>Hierarchy:</strong> Test → Full Syllabus / Subject → Chapter → Test Configuration → Questions → Result → Review
+              </p>
+            </div>
+
+            <!-- Empty State for Tests (Part 3) -->
+            <div class="empty-state">
+              <div class="empty-state-icon-wrap">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <h4 class="empty-state-title">No Mock Tests Available Yet</h4>
+              <p class="empty-state-subtitle">
+                Chapter tests, subject-wise quizzes, and full-length board mock exams will be introduced in Part 3 without mock question placeholders.
+              </p>
+            </div>
+          </section>
+
+          <!-- --------------------------------------------------------------
+               SCREEN 4: CHALLENGES
+               -------------------------------------------------------------- -->
+          <section id="screen-challenges" class="tab-screen">
+            <div class="section-title-row">
+              <h3 class="section-title">Academic Challenges</h3>
+              <span class="academic-badge" style="background: var(--brand-gold-subtle); color: var(--color-text-accent);">Zero XP</span>
+            </div>
+
+            <div class="feature-card challenge-card">
+              <div class="card-header-row">
+                <span class="card-tag">Daily Challenge</span>
+                <span class="academic-badge">Today</span>
+              </div>
+              <h4 class="card-title">Daily Subject Question</h4>
+              <p class="card-desc">Solve daily faculty problem to reinforce your conceptual foundation.</p>
+              <div class="empty-state" style="margin-top: var(--spacing-3); padding: var(--spacing-4);">
+                <p class="empty-state-subtitle" style="margin-bottom: 0;">Today's challenge questions are being prepared by subject mentors in Firebase.</p>
+              </div>
+            </div>
+
+            <div class="feature-card challenge-card">
+              <div class="card-header-row">
+                <span class="card-tag">Weekly Challenge</span>
+                <span class="academic-badge">This Week</span>
+              </div>
+              <h4 class="card-title">Weekly Mock Marathon</h4>
+              <p class="card-desc">Comprehensive test to evaluate overall chapter retention.</p>
+              <div class="empty-state" style="margin-top: var(--spacing-3); padding: var(--spacing-4);">
+                <p class="empty-state-subtitle" style="margin-bottom: 0;">Weekly challenges will open in accordance with the faculty schedule in Part 4.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- --------------------------------------------------------------
+               SCREEN 5: ACCOUNT
+               -------------------------------------------------------------- -->
+          <section id="screen-account" class="tab-screen">
+            <div class="section-title-row">
+              <h3 class="section-title">Student Account</h3>
+            </div>
+
+            <!-- Profile Summary Card -->
+            <div class="profile-card">
+              <div class="profile-avatar-circle" id="student-avatar-initial">S</div>
+              <div class="profile-info">
+                <h3 class="student-name-display">Student Name</h3>
+                <p class="student-email-display">student@example.com</p>
+                <div style="display: flex; gap: 6px; margin-top: 6px;">
+                  <span class="academic-badge student-class-display">Class 10</span>
+                  <span class="academic-badge student-board-display">CBSE</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Academic Profile Information -->
+            <div class="feature-card">
+              <div class="card-header-row">
+                <span class="card-tag">Academic Information</span>
+                <button type="button" class="text-link" data-navigate-view="onboarding">Edit Details</button>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-3); margin-top: var(--spacing-2); font-size: var(--font-size-xs);">
+                <div>
+                  <span style="color: var(--color-text-secondary); display: block;">Class:</span>
+                  <strong class="student-class-display" style="color: var(--color-text-primary);">Class 10</strong>
+                </div>
+                <div>
+                  <span style="color: var(--color-text-secondary); display: block;">Board:</span>
+                  <strong class="student-board-display" style="color: var(--color-text-primary);">CBSE</strong>
+                </div>
+                <div>
+                  <span style="color: var(--color-text-secondary); display: block;">Medium:</span>
+                  <strong class="student-medium-display" style="color: var(--color-text-primary);">English Medium</strong>
+                </div>
+                <div>
+                  <span style="color: var(--color-text-secondary); display: block;">Preferred Language:</span>
+                  <strong class="student-lang-display" style="color: var(--color-text-primary);">English</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Learning Statistics Foundation (NO XP, NO LEVEL) -->
+            <div class="feature-card">
+              <div class="card-header-row">
+                <span class="card-tag">Study Statistics</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-2); text-align: center; margin-top: var(--spacing-2);">
+                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
+                  <strong style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0</strong>
+                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Chapters Completed</span>
+                </div>
+                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
+                  <strong style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0</strong>
+                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Tests Taken</span>
+                </div>
+                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
+                  <strong style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0h</strong>
+                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Study Time</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preferences & Settings -->
+            <div class="settings-list">
+              <!-- Dark Mode Switch -->
+              <div class="settings-item">
+                <div class="settings-item-left">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                  <span>Dark Mode</span>
+                </div>
+                <div class="settings-item-right">
+                  <label class="switch">
+                    <input type="checkbox" id="theme-switch-checkbox">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Firebase Project Integration -->
+              <div class="settings-item" data-open-modal="modal-firebase-config">
+                <div class="settings-item-left">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  <span>Firebase Project Config</span>
+                </div>
+                <div class="settings-item-right">
+                  <span id="firebase-status-badge" class="academic-badge">Foundation Mode</span>
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+
+              <!-- Notifications -->
+              <div class="settings-item">
+                <div class="settings-item-left">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  <span>Study Reminders</span>
+                </div>
+                <div class="settings-item-right">
+                  <span style="color: var(--color-status-success); font-weight: 600;">Active</span>
+                </div>
+              </div>
+
+              <!-- About Notes Wallah -->
+              <div class="settings-item" onclick="window.NotesWallahUI.showToast('Notes Wallah - Part 1 of 10 Foundation Active')">
+                <div class="settings-item-left">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>About Notes Wallah</span>
+                </div>
+                <div class="settings-item-right">
+                  <span>v1.0 (Part 1/10)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Logout Button -->
+            <button type="button" id="btn-logout" class="btn btn-outline btn-block" style="color: var(--color-status-error); border-color: var(--color-border-subtle); margin-top: var(--spacing-4);">
+              <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24" style="stroke: var(--color-status-error);"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>Log Out</span>
+            </button>
+          </section>
+
+        </main>
+
+        <!-- Fixed Bottom Navigation Bar (5 Destinations: Home, Study, Test, Challenges, Account) -->
+        <nav class="app-bottom-nav">
+          <button type="button" class="nav-item active" data-tab="home" aria-label="Home">
+            <span class="nav-icon-wrap">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 10.2L12 3l9 7.2v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-10z"/></svg>
+            </span>
+            <span class="nav-label">Home</span>
+          </button>
+
+          <button type="button" class="nav-item" data-tab="study" aria-label="Study">
+            <span class="nav-icon-wrap">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </span>
+            <span class="nav-label">Study</span>
+          </button>
+
+          <button type="button" class="nav-item" data-tab="test" aria-label="Test">
+            <span class="nav-icon-wrap">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </span>
+            <span class="nav-label">Test</span>
+          </button>
+
+          <button type="button" class="nav-item" data-tab="challenges" aria-label="Challenges">
+            <span class="nav-icon-wrap">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+            </span>
+            <span class="nav-label">Challenges</span>
+          </button>
+
+          <button type="button" class="nav-item" data-tab="account" aria-label="Account">
+            <span class="nav-icon-wrap">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <span class="nav-label">Account</span>
+          </button>
+        </nav>
+
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         MODALS & DIALOGS
+         ==================================================================== -->
+
+    <!-- 1. Forgot Password Modal -->
+    <div id="modal-forgot-password" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title">Reset Password</h3>
+          <button type="button" class="icon-btn" data-close-modal="modal-forgot-password" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <form id="forgot-password-form">
+          <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-4);">
+            Enter your registered email and we'll send you a password reset link.
+          </p>
+          <div class="form-group" style="margin-bottom: var(--spacing-4);">
+            <label class="form-label" for="forgot-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" id="forgot-email" class="form-input" placeholder="student@example.com" required>
+            </div>
+          </div>
+          <button type="submit" id="forgot-submit-btn" class="btn btn-primary btn-block">Send Reset Link</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. Pro Notes Ad Requirement Gatekeeper Modal -->
+    <div id="modal-pro-notes-ad" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: var(--spacing-2);">
+            <span class="pro-badge" style="margin: 0;">PRO NOTES</span>
+            <h3 class="modal-title">Ad Gatekeeper</h3>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="modal-pro-notes-ad" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style="padding: var(--spacing-2) 0;">
+          <div style="width: 52px; height: 52px; border-radius: var(--radius-full); background: var(--brand-gold-subtle); display: flex; align-items: center; justify-content: center; color: var(--brand-gold); margin: 0 auto var(--spacing-3);">
+            <svg class="icon-svg icon-svg-lg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p id="pro-notes-modal-message" style="font-size: var(--font-size-sm); color: var(--color-text-secondary); text-align: center; margin-bottom: var(--spacing-4); line-height: 1.6;">
+            Pro Notes require watching an advertisement before unlocking. In Part 1, the centralized AdService interface is established without fake ad completion.
+          </p>
+          <button type="button" class="btn btn-primary btn-block" data-close-modal="modal-pro-notes-ad">Understood</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Firebase Project Configuration Modal -->
+    <div id="modal-firebase-config" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title">Firebase Project Setup</h3>
+          <button type="button" class="icon-btn" data-close-modal="modal-firebase-config" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <form id="firebase-config-form">
+          <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-3);">
+            Enter your Firebase Web App credentials to connect this app to your official Firebase Console project:
+          </p>
+          <div class="form-group" style="margin-bottom: var(--spacing-2);">
+            <label class="form-label" for="fb-cfg-api-key">API Key</label>
+            <input type="text" id="fb-cfg-api-key" class="form-input" style="border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm);" placeholder="AIzaSy...">
+          </div>
+          <div class="form-group" style="margin-bottom: var(--spacing-2);">
+            <label class="form-label" for="fb-cfg-project-id">Project ID</label>
+            <input type="text" id="fb-cfg-project-id" class="form-input" style="border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm);" placeholder="notes-wallah-prod">
+          </div>
+          <div class="form-group" style="margin-bottom: var(--spacing-2);">
+            <label class="form-label" for="fb-cfg-auth-domain">Auth Domain</label>
+            <input type="text" id="fb-cfg-auth-domain" class="form-input" style="border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm);" placeholder="notes-wallah.firebaseapp.com">
+          </div>
+          <div class="form-group" style="margin-bottom: var(--spacing-2);">
+            <label class="form-label" for="fb-cfg-storage-bucket">Storage Bucket</label>
+            <input type="text" id="fb-cfg-storage-bucket" class="form-input" style="border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm);" placeholder="notes-wallah.appspot.com">
+          </div>
+          <div class="form-group" style="margin-bottom: var(--spacing-4);">
+            <label class="form-label" for="fb-cfg-app-id">App ID</label>
+            <input type="text" id="fb-cfg-app-id" class="form-input" style="border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm);" placeholder="1:123456789:web:abcdef">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Save Firebase Configuration</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" aria-live="polite"></div>
+
+  </div>
+
+  <!-- Application Logic Modules -->
+  <script src="js/firebase.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/adService.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

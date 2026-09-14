@@ -1,0 +1,18 @@
+{
+  "name": "Notes Wallah",
+  "short_name": "Notes Wallah",
+  "description": "Educational platform for Indian students - Part 1 Foundation",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F7F5F0",
+  "theme_color": "#132242",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+/**
+ * NOTES WALLAH - Responsive Layouts & Device Optimizations
+ * Mobile-First: Small phones (<=360px), standard phones (361-480px),
+ * large phones/foldables (481-768px), and tablet/desktop preview shell.
+ */
+
+/* Respect Safe Area Insets on Modern Mobile Devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .app-topbar {
+    padding-top: env(safe-area-inset-top);
+    height: calc(var(--header-height) + env(safe-area-inset-top));
+  }
+  
+  .app-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  }
+  
+  .app-content-viewport {
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--spacing-6));
+  }
+
+  #toast-container {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--spacing-4));
+  }
+}
+
+/* Small Screens (<= 360px: e.g., Galaxy Fold outer screen, compact Androids) */
+@media screen and (max-width: 360px) {
+  :root {
+    --font-size-base: 0.875rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.35rem;
+    --spacing-4: 0.75rem;
+    --spacing-5: 1rem;
+  }
+
+  .quick-access-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2);
+  }
+
+  .onboarding-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-container {
+    padding: var(--spacing-4) var(--spacing-3);
+  }
+
+  .nav-item .nav-label {
+    font-size: 0.625rem;
+  }
+
+  .brand-logo-compact {
+    height: 28px;
+  }
+}
+
+/* Medium Phones (361px - 480px: Standard modern smartphones) */
+@media screen and (min-width: 361px) and (max-width: 480px) {
+  .app-container {
+    width: 100%;
+  }
+}
+
+/* Larger Displays (Desktop, Tablets, ChromeOS) */
+@media screen and (min-width: 768px) {
+  body {
+    background-color: #080D18; /* Dark framing canvas on wide monitors */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app-container {
+    min-height: 92vh;
+    max-height: 96vh;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-subtle);
+    overflow: hidden;
+    margin: 2vh auto;
+  }
+
+  .app-bottom-nav {
+    border-bottom-left-radius: var(--radius-xl);
+    border-bottom-right-radius: var(--radius-xl);
+  }
+}
+
+/* High-DPI and Touch Screen Enhancements */
+@media (pointer: coarse) {
+  .btn, .choice-chip, .quick-action-btn, .nav-item, .settings-item {
+    cursor: default;
+  }
+}
+
+/* Prevent layout shift during soft keyboard emergence on mobile */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .splash-logo-wrap {
+    width: 60px;
+    height: 60px;
+    margin-bottom: var(--spacing-2);
+  }
+
+  .auth-container {
+    padding: var(--spacing-3);
+  }
+
+  .app-topbar {
+    height: 48px;
+  }
+
+  .app-bottom-nav {
+    height: 52px;
+  }
+}

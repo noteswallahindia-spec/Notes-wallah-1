@@ -1,0 +1,179 @@
+/**
+ * NOTES WALLAH - Brand Design System & Centralized Theme Tokens
+ * Visual Identity:
+ * - Primary Navy: #132242
+ * - Gold:         #E8A33D
+ * - Cream:        #F7F5F0
+ * - White:        #FFFFFF
+ * - Dark Navy:    #0D1424
+ */
+
+:root {
+  /* Brand Core Colors */
+  --brand-navy-primary: #132242;
+  --brand-navy-dark: #0D1424;
+  --brand-navy-light: #1E3360;
+  --brand-gold: #E8A33D;
+  --brand-gold-hover: #D48E28;
+  --brand-gold-subtle: rgba(232, 163, 61, 0.12);
+  --brand-cream: #F7F5F0;
+  --brand-white: #FFFFFF;
+
+  /* Typography System */
+  --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.844rem;   /* 13.5px */
+  --font-size-base: 0.938rem; /* 15px */
+  --font-size-md: 1.063rem;   /* 17px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
+  --font-size-2xl: 1.875rem;  /* 30px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-heavy: 800;
+
+  /* 8pt Spacing Grid */
+  --spacing-1: 0.25rem;  /* 4px */
+  --spacing-2: 0.5rem;   /* 8px */
+  --spacing-3: 0.75rem;  /* 12px */
+  --spacing-4: 1rem;     /* 16px */
+  --spacing-5: 1.25rem;  /* 20px */
+  --spacing-6: 1.5rem;   /* 24px */
+  --spacing-8: 2rem;     /* 32px */
+  --spacing-10: 2.5rem;  /* 40px */
+
+  /* Border Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  /* Elevation & Shadows */
+  --shadow-sm: 0 1px 3px rgba(13, 20, 36, 0.06);
+  --shadow-md: 0 4px 12px rgba(13, 20, 36, 0.08);
+  --shadow-lg: 0 8px 24px rgba(13, 20, 36, 0.12);
+  --shadow-gold: 0 4px 16px rgba(232, 163, 61, 0.24);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Touch Target Constraint */
+  --min-touch-target: 48px;
+
+  /* Layout Heights */
+  --header-height: 60px;
+  --bottom-nav-height: 64px;
+}
+
+/* ==========================================================================
+   Light Mode (Default Theme)
+   ========================================================================== */
+:root,
+[data-theme="light"] {
+  --color-bg-canvas: #F7F5F0;          /* Warm Cream Canvas */
+  --color-bg-surface: #FFFFFF;         /* Pure White Surface */
+  --color-bg-subtle: #EDEAE1;          /* Soft Cream Neutral */
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-input: #FFFFFF;
+
+  --color-text-primary: #132242;       /* Deep Navy Primary Text */
+  --color-text-secondary: #4A5568;     /* Muted Slate Text */
+  --color-text-muted: #718096;         /* Secondary Muted Text */
+  --color-text-inverse: #FFFFFF;
+  --color-text-accent: #C88320;        /* Readable Gold Accent */
+
+  --color-border-subtle: #E4DFD5;      /* Warm border */
+  --color-border-hover: #CBD5E1;
+  --color-border-focus: #132242;
+  --color-border-gold: rgba(232, 163, 61, 0.4);
+
+  --color-nav-bg: #FFFFFF;
+  --color-nav-border: #E8E5DC;
+  --color-nav-active: #132242;
+  --color-nav-inactive: #64748B;
+  --color-nav-indicator: rgba(19, 34, 66, 0.08);
+
+  --color-status-success: #16A34A;
+  --color-status-success-bg: #DCFCE7;
+  --color-status-error: #DC2626;
+  --color-status-error-bg: #FEE2E2;
+  --color-status-warning: #D97706;
+  --color-status-warning-bg: #FEF3C7;
+  --color-status-info: #132242;
+  --color-status-info-bg: #E0E7FF;
+
+  --badge-bg: #EBE7DD;
+  --badge-text: #132242;
+
+  --color-btn-primary-bg: #132242;
+  --color-btn-primary-text: #FFFFFF;
+  --color-btn-primary-hover: #0D1424;
+
+  --color-btn-gold-bg: #E8A33D;
+  --color-btn-gold-text: #0D1424;
+  --color-btn-gold-hover: #D48E28;
+
+  --color-card-border: #E8E4DA;
+  --color-divider: #ECE8DE;
+}
+
+/* ==========================================================================
+   Dark Mode Theme (Night Study Mode)
+   High contrast, deep navy palette comfortable for long study sessions
+   ========================================================================== */
+[data-theme="dark"] {
+  --color-bg-canvas: #0D1424;          /* Dark Navy Canvas */
+  --color-bg-surface: #132242;         /* Primary Navy Card Surface */
+  --color-bg-subtle: #192C52;          /* Subtle Elevated Navy */
+  --color-bg-elevated: #1D315B;        /* High Navy */
+  --color-bg-input: #101C36;
+
+  --color-text-primary: #F7F5F0;       /* Cream High Contrast Text */
+  --color-text-secondary: #CBD5E1;     /* Soft Light Slate */
+  --color-text-muted: #94A3B8;         /* Subdued Slate */
+  --color-text-inverse: #0D1424;
+  --color-text-accent: #E8A33D;        /* Vibrant Gold */
+
+  --color-border-subtle: #233763;      /* Navy Borders */
+  --color-border-hover: #344C82;
+  --color-border-focus: #E8A33D;
+  --color-border-gold: rgba(232, 163, 61, 0.5);
+
+  --color-nav-bg: #0F1A30;
+  --color-nav-border: #1E2F52;
+  --color-nav-active: #E8A33D;
+  --color-nav-inactive: #94A3B8;
+  --color-nav-indicator: rgba(232, 163, 61, 0.16);
+
+  --color-status-success: #34D399;
+  --color-status-success-bg: rgba(52, 211, 153, 0.15);
+  --color-status-error: #F87171;
+  --color-status-error-bg: rgba(248, 113, 113, 0.15);
+  --color-status-warning: #FBBF24;
+  --color-status-warning-bg: rgba(251, 191, 36, 0.15);
+  --color-status-info: #60A5FA;
+  --color-status-info-bg: rgba(96, 165, 250, 0.15);
+
+  --badge-bg: #1A2B50;
+  --badge-text: #E8A33D;
+
+  --color-btn-primary-bg: #E8A33D;
+  --color-btn-primary-text: #0D1424;
+  --color-btn-primary-hover: #D48E28;
+
+  --color-btn-gold-bg: #E8A33D;
+  --color-btn-gold-text: #0D1424;
+  --color-btn-gold-hover: #D48E28;
+
+  --color-card-border: #20335C;
+  --color-divider: #1D2E54;
+}
