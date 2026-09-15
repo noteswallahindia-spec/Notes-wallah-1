@@ -1644,3 +1644,106 @@ input:checked + .slider:before {
   line-height: 1.4;
 }
 
+/* ==========================================================================
+   PART 5: Test Engine & Interactive Practice Runner
+   ========================================================================== */
+.palette-pill {
+  min-width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.palette-pill.palette-answered {
+  background-color: #2E7D32;
+  color: #FFFFFF;
+  border-color: #2E7D32;
+}
+
+.palette-pill.palette-unanswered {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+}
+
+.palette-pill.palette-marked {
+  background-color: var(--brand-gold);
+  color: #FFFFFF;
+  border-color: var(--brand-gold);
+}
+
+.palette-pill.palette-active {
+  outline: 2px solid var(--brand-navy-primary);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 2px rgba(19, 34, 66, 0.2);
+}
+
+/* Test Option Card */
+.test-option-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.test-option-card:hover {
+  background-color: var(--color-bg-surface);
+  border-color: var(--color-border-hover);
+}
+
+.test-option-card.selected {
+  background-color: rgba(232, 163, 61, 0.12);
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 0 1px var(--brand-gold);
+}
+
+.option-letter-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-heavy);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.test-option-card.selected .option-letter-badge {
+  background-color: var(--brand-gold);
+  border-color: var(--brand-gold);
+  color: #FFFFFF;
+}
+
+.option-text {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.btn-marked-active {
+  background-color: var(--brand-gold-subtle) !important;
+  color: var(--brand-gold) !important;
+  border-color: var(--brand-gold) !important;
+}
+
+

@@ -16,15 +16,15 @@
  */
 
 // 1. FIREBASE CONFIGURATION TEMPLATE
-// Users can insert real project configuration values here or via the UI settings modal.
-// Do NOT hardcode private server keys or service account credentials here.
+// Real official Firebase Project credentials for wala-notes-ai-studio
 const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyAtRWfhW20nt31sIxLv47A-OlPRZzsQmaQ",
+  authDomain: "wala-notes-ai-studio.firebaseapp.com",
+  projectId: "wala-notes-ai-studio",
+  storageBucket: "wala-notes-ai-studio.firebasestorage.app",
+  messagingSenderId: "326539144217",
+  appId: "1:326539144217:web:3c7d2e847e004623618e88",
+  measurementId: "G-6M6BLT7XM5"
 };
 
 class FirebaseService {
@@ -50,7 +50,7 @@ class FirebaseService {
       const stored = localStorage.getItem("nw_firebase_config");
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed && typeof parsed === "object") {
+        if (parsed && typeof parsed === "object" && this.validateConfig(parsed)) {
           return parsed;
         }
       }
@@ -156,6 +156,13 @@ class FirebaseService {
       }
       if (typeof window.firebase.storage === "function") {
         this.storage = window.firebase.storage();
+      }
+      if (typeof window.firebase.analytics === "function" && this.config.measurementId) {
+        try {
+          this.analytics = window.firebase.analytics();
+        } catch (e) {
+          // Analytics is optional
+        }
       }
 
       this.isInitialized = true;

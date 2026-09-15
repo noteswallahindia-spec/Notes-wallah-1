@@ -199,6 +199,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (elChapters) elChapters.textContent = stats.totalChapters;
       if (elNotes) elNotes.textContent = stats.totalProNotes;
       if (elActiveNotes) elActiveNotes.textContent = `${stats.activeProNotes} Active`;
+
+      const elTests = document.getElementById("metric-tests");
+      if (elTests) {
+        const tests = await getAdminTestsList();
+        elTests.textContent = tests.length;
+      }
     } catch (e) {
       console.warn("Could not refresh metrics:", e);
     }
@@ -218,6 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (target === "notes") loadProNotesTable();
       if (target === "syllabus") loadSyllabusHierarchy();
+      if (target === "tests") loadAdminTestsManagement();
     });
   });
 
@@ -637,6 +644,307 @@ document.addEventListener("DOMContentLoaded", async () => {
         btnSyncSyllabus.textContent = "Sync NCERT Syllabus to Firestore";
       }
     });
+  }
+
+  // ==========================================
+  // TEST MANAGEMENT MODULE (Part 5 of 10)
+  // ==========================================
+
+  async function getAdminTestsList() {
+    // 1. From Firestore if connected
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        const snap = await fb.firestore.collection(db.COLLECTION_TESTS).get();
+        if (!snap.empty) {
+          return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+      } catch (e) {
+        console.warn("[Admin] Firestore tests fetch fallback:", e);
+      }
+    }
+    // 2. Local custom tests merged with seed tests if any
+    try {
+      const stored = JSON.parse(localStorage.getItem("nw_custom_tests") || "[]");
+      if (stored.length > 0) return stored;
+    } catch (e) {}
+
+    // Fallback seed test summaries
+    return [
+      { id: "test_c10_sci_ch1", class_id: "class_10", subject_id: "c10_science", title: "Class 10 Science: Chemical Reactions & Equations", test_type: "chapter", duration_seconds: 900, question_count: 5, difficulty: "Standard", is_active: true },
+      { id: "test_c10_sci_ch2", class_id: "class_10", subject_id: "c10_science", title: "Class 10 Science: Acids, Bases and Salts", test_type: "chapter", duration_seconds: 900, question_count: 5, difficulty: "Standard", is_active: true },
+      { id: "test_c10_math_ch1", class_id: "class_10", subject_id: "c10_maths", title: "Class 10 Maths: Real Numbers & Polynomials", test_type: "chapter", duration_seconds: 900, question_count: 5, difficulty: "Standard", is_active: true },
+      { id: "test_c10_soc_ch1", class_id: "class_10", subject_id: "c10_social", title: "Class 10 Social: Nationalism in Europe & India", test_type: "chapter", duration_seconds: 900, question_count: 5, difficulty: "Standard", is_active: true },
+      { id: "test_c10_full_science", class_id: "class_10", subject_id: "c10_science", title: "Class 10 Science: Full Board Mock Examination", test_type: "full_syllabus", duration_seconds: 1200, question_count: 5, difficulty: "Board Target", is_active: true },
+      { id: "test_c9_sci_ch1", class_id: "class_9", subject_id: "c9_science", title: "Class 9 Science: Matter in Our Surroundings", test_type: "chapter", duration_seconds: 900, question_count: 3, difficulty: "Standard", is_active: true },
+      { id: "test_c11_phy_ch1", class_id: "class_11", subject_id: "c11_physics", title: "Class 11 Physics: Physical World & Units", test_type: "chapter", duration_seconds: 900, question_count: 3, difficulty: "Standard", is_active: true },
+      { id: "test_c12_phy_ch1", class_id: "class_12", subject_id: "c12_physics", title: "Class 12 Physics: Electrostatics & Fields", test_type: "chapter", duration_seconds: 900, question_count: 3, difficulty: "Standard", is_active: true }
+    ];
+  }
+
+  let testsInitialized = false;
+  async function loadAdminTestsManagement() {
+    const testClassSelect = document.getElementById("test-select-class");
+    const testSubjectSelect = document.getElementById("test-select-subject");
+    const testChapterSelect = document.getElementById("test-select-chapter");
+    const questionTestSelect = document.getElementById("question-select-test");
+
+    // Populate Class dropdown
+    if (testClassSelect && testClassSelect.options.length <= 1) {
+      const classes = await db.getClasses();
+      testClassSelect.innerHTML = `<option value="">-- Select Class --</option>`;
+      classes.forEach(c => {
+        testClassSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+      });
+      testClassSelect.value = "class_10";
+      await onTestClassChanged("class_10");
+    }
+
+    if (testClassSelect && !testClassSelect.dataset.listenerAttached) {
+      testClassSelect.dataset.listenerAttached = "true";
+      testClassSelect.addEventListener("change", async (e) => {
+        await onTestClassChanged(e.target.value);
+      });
+    }
+
+    async function onTestClassChanged(classId) {
+      if (!testSubjectSelect) return;
+      testSubjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
+      if (!classId) return;
+      const subjects = await db.getSubjects(classId);
+      subjects.forEach(s => {
+        testSubjectSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+      });
+      if (testChapterSelect) {
+        testChapterSelect.innerHTML = `<option value="">-- All Chapters / Full Subject Mock --</option>`;
+      }
+    }
+
+    if (testSubjectSelect && !testSubjectSelect.dataset.listenerAttached) {
+      testSubjectSelect.dataset.listenerAttached = "true";
+      testSubjectSelect.addEventListener("change", async (e) => {
+        const subId = e.target.value;
+        if (!testChapterSelect) return;
+        testChapterSelect.innerHTML = `<option value="">-- All Chapters / Full Subject Mock --</option>`;
+        if (!subId) return;
+        const chapters = await db.getChapters(subId);
+        chapters.forEach(ch => {
+          testChapterSelect.innerHTML += `<option value="${ch.id}">Ch ${ch.chapter_number}: ${ch.chapter_name}</option>`;
+        });
+      });
+    }
+
+    // Refresh question target test dropdown and table
+    await refreshAdminTestsView();
+
+    // Bind Forms once
+    if (!testsInitialized) {
+      testsInitialized = true;
+      bindTestForms();
+    }
+  }
+
+  async function refreshAdminTestsView() {
+    const tests = await getAdminTestsList();
+    const questionTestSelect = document.getElementById("question-select-test");
+    const tableBody = document.getElementById("admin-tests-table-body");
+    const emptyState = document.getElementById("admin-tests-table-empty");
+    const badgeCount = document.getElementById("admin-tests-count-badge");
+
+    if (badgeCount) {
+      badgeCount.textContent = `${tests.length} tests published`;
+    }
+
+    // Populate question target test select
+    if (questionTestSelect) {
+      const currVal = questionTestSelect.value;
+      questionTestSelect.innerHTML = `<option value="">-- Select Test Series --</option>`;
+      tests.forEach(t => {
+        questionTestSelect.innerHTML += `<option value="${t.id}">${t.title} (${t.class_id})</option>`;
+      });
+      if (currVal) questionTestSelect.value = currVal;
+    }
+
+    // Populate tests table
+    if (!tableBody) return;
+    if (tests.length === 0) {
+      tableBody.innerHTML = "";
+      if (emptyState) emptyState.style.display = "block";
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = "none";
+    tableBody.innerHTML = tests.map(t => {
+      const durationMins = Math.round((t.duration_seconds || 900) / 60);
+      const typeLabel = t.test_type === "full_syllabus" ? "Full Syllabus" : (t.test_type === "subject" ? "Subject Mock" : "Chapter Test");
+      return `
+        <tr>
+          <td>
+            <strong>${t.title}</strong>
+            <div style="font-size:0.75rem; color:var(--admin-text-secondary);">${t.id}</div>
+          </td>
+          <td><span class="badge" style="background:#E2E8F0; color:#334155;">${t.class_id}</span></td>
+          <td>${t.subject_id || "All Subjects"}</td>
+          <td><span class="badge" style="background:#FEF3C7; color:var(--admin-gold);">${typeLabel}</span></td>
+          <td><strong>${t.question_count || (t.questions ? t.questions.length : 5)}</strong> Qs</td>
+          <td>${durationMins}m</td>
+          <td>
+            <span class="badge ${t.is_active !== false ? 'badge-active' : 'badge-inactive'}">
+              ${t.is_active !== false ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+          <td>
+            <button type="button" class="btn-action btn-delete-test" data-test-id="${t.id}" title="Delete Test">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    // Bind delete buttons
+    tableBody.querySelectorAll(".btn-delete-test").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const testId = btn.getAttribute("data-test-id");
+        if (confirm(`Are you sure you want to delete test "${testId}"?`)) {
+          await db.deleteTest(testId);
+          showToast("Test deleted successfully.", "info");
+          await refreshAdminTestsView();
+          await refreshDashboard();
+        }
+      });
+    });
+  }
+
+  function bindTestForms() {
+    const formCreateTest = document.getElementById("form-create-test");
+    const formAddQuestion = document.getElementById("form-add-question");
+
+    // Form 1: Create Test
+    if (formCreateTest) {
+      formCreateTest.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const classId = document.getElementById("test-select-class").value;
+        const subjectId = document.getElementById("test-select-subject").value;
+        const chapterId = document.getElementById("test-select-chapter").value;
+        const title = document.getElementById("test-input-title").value.trim();
+        const testType = document.getElementById("test-select-type").value;
+        const durationMins = parseInt(document.getElementById("test-input-duration").value, 10) || 15;
+        const difficulty = document.getElementById("test-select-difficulty").value;
+        const description = document.getElementById("test-input-desc").value.trim();
+
+        if (!classId || !subjectId || !title) {
+          showToast("Please fill all required test fields.", "error");
+          return;
+        }
+
+        const saveBtn = document.getElementById("btn-save-test");
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Creating Test..."; }
+
+        try {
+          const testData = {
+            id: `test_${classId}_${subjectId}_${Date.now().toString(36)}`,
+            class_id: classId,
+            subject_id: subjectId,
+            chapter_id: chapterId || "",
+            title: title,
+            test_type: testType,
+            duration_seconds: durationMins * 60,
+            question_count: 0,
+            difficulty: difficulty,
+            description: description,
+            is_active: true
+          };
+
+          await db.createTest(testData);
+          showToast(`Test series "${title}" created successfully! Now add questions below.`, "success");
+          formCreateTest.reset();
+          await refreshAdminTestsView();
+          await refreshDashboard();
+
+          // Auto select newly created test in Question Form
+          const qSelect = document.getElementById("question-select-test");
+          if (qSelect) qSelect.value = testData.id;
+        } catch (err) {
+          showToast("Failed to create test: " + err.message, "error");
+        } finally {
+          if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Create Test Series"; }
+        }
+      });
+    }
+
+    // Form 2: Add Question with Validation
+    if (formAddQuestion) {
+      formAddQuestion.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const testId = document.getElementById("question-select-test").value;
+        const questionText = document.getElementById("question-input-text").value.trim();
+        const opt0 = document.getElementById("q-opt-0").value.trim();
+        const opt1 = document.getElementById("q-opt-1").value.trim();
+        const opt2 = document.getElementById("q-opt-2").value.trim();
+        const opt3 = document.getElementById("q-opt-3").value.trim();
+        const correctIndex = parseInt(document.getElementById("q-select-correct").value, 10);
+        const concept = document.getElementById("q-input-concept").value.trim();
+        const marks = parseInt(document.getElementById("q-input-marks").value, 10) || 1;
+        const order = parseInt(document.getElementById("q-input-order").value, 10) || 1;
+        const explanation = document.getElementById("q-input-explanation").value.trim();
+
+        // Admin-side Question Validation
+        if (!testId) {
+          showToast("Please select a target Test Series.", "error");
+          return;
+        }
+        if (!questionText) {
+          showToast("Question statement is required.", "error");
+          return;
+        }
+        if (!opt0 || !opt1 || !opt2 || !opt3) {
+          showToast("All 4 options (A, B, C, D) are required.", "error");
+          return;
+        }
+        if (isNaN(correctIndex) || correctIndex < 0 || correctIndex > 3) {
+          showToast("Valid correct option is required.", "error");
+          return;
+        }
+
+        const saveQBtn = document.getElementById("btn-save-question");
+        if (saveQBtn) { saveQBtn.disabled = true; saveQBtn.textContent = "Saving Question..."; }
+
+        try {
+          const questionData = {
+            test_id: testId,
+            question: questionText,
+            question_type: "mcq_single",
+            options: [opt0, opt1, opt2, opt3],
+            correct_answer: correctIndex,
+            correct_index: correctIndex,
+            concept: concept,
+            explanation: explanation,
+            marks: marks,
+            order: order,
+            is_active: true
+          };
+
+          await db.addQuestionToTest(testId, questionData);
+          showToast("Question added successfully to test series!", "success");
+
+          // Reset question fields while keeping selected test
+          document.getElementById("question-input-text").value = "";
+          document.getElementById("q-opt-0").value = "";
+          document.getElementById("q-opt-1").value = "";
+          document.getElementById("q-opt-2").value = "";
+          document.getElementById("q-opt-3").value = "";
+          document.getElementById("q-input-explanation").value = "";
+          document.getElementById("q-input-concept").value = "";
+          document.getElementById("q-input-order").value = String(order + 1);
+
+          await refreshAdminTestsView();
+        } catch (err) {
+          showToast("Failed to save question: " + err.message, "error");
+        } finally {
+          if (saveQBtn) { saveQBtn.disabled = false; saveQBtn.textContent = "Save Question to Test"; }
+        }
+      });
+    }
   }
 
   // Helper for Toast Notifications

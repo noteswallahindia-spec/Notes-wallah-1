@@ -18,12 +18,13 @@
 // Official Firebase Project Configuration Placeholder
 // Students/Developers can update this directly or inject via localStorage('nw_firebase_config')
 const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "notes-wallah-edu.firebaseapp.com",
-  projectId: "notes-wallah-edu",
-  storageBucket: "notes-wallah-edu.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890"
+  apiKey: "AIzaSyAtRWfhW20nt31sIxLv47A-OlPRZzsQmaQ",
+  authDomain: "wala-notes-ai-studio.firebaseapp.com",
+  projectId: "wala-notes-ai-studio",
+  storageBucket: "wala-notes-ai-studio.firebasestorage.app",
+  messagingSenderId: "326539144217",
+  appId: "1:326539144217:web:3c7d2e847e004623618e88",
+  measurementId: "G-6M6BLT7XM5"
 };
 
 class FirebaseService {

@@ -103,6 +103,19 @@ class AppRouter {
       }
     }
 
+    // Test series and Daily challenge initialization triggers
+    if (tabId === "test" && window.NotesWallahTestEngine) {
+      const currentUser = window.NotesWallahAuth ? window.NotesWallahAuth.getCurrentUser() : null;
+      const classId = (currentUser && currentUser.academic_profile && currentUser.academic_profile.class) || "class_10";
+      window.NotesWallahTestEngine.renderTestHub(classId);
+    }
+
+    if (tabId === "challenges" && window.NotesWallahTestEngine) {
+      const currentUser = window.NotesWallahAuth ? window.NotesWallahAuth.getCurrentUser() : null;
+      const classId = (currentUser && currentUser.academic_profile && currentUser.academic_profile.class) || "class_10";
+      window.NotesWallahTestEngine.renderChallenges(classId);
+    }
+
     // Scroll viewport to top
     const viewport = document.querySelector(".app-content-viewport");
     if (viewport) viewport.scrollTop = 0;

@@ -1,6 +1,6 @@
 {
   "name": "Notes Wallah",
-  "description": "Educational platform for Indian students - Part 4 Multilingual System, Firebase Diagnostic Verification & Quality Assurance",
+  "description": "Educational platform for Indian students - Part 5 Academic Test System (Test Hub, Full Syllabus, Subjects, Chapters, Diagnostic Execution, Result Review)",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

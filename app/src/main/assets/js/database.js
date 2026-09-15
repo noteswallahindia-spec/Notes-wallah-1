@@ -915,24 +915,353 @@ class DatabaseService {
   }
 
   // ==========================================================================
-  // PREPARED FOR PARTS 3 & 4 (Zero XP Test & Challenge schemas)
+  // PART 5: TEST ENGINE & ACADEMIC CHALLENGE PERSISTENCE (Zero XP)
   // ==========================================================================
+
+  /**
+   * Record a student's completed test attempt
+   */
+  async recordTestAttempt(userId, evaluation) {
+    const attemptId = `attempt_${Date.now()}`;
+    const record = {
+      id: attemptId,
+      user_id: userId,
+      test_id: evaluation.testId,
+      test_title: evaluation.testTitle,
+      subject_name: evaluation.subjectName,
+      total_questions: evaluation.totalQuestions,
+      correct_count: evaluation.correctCount,
+      incorrect_count: evaluation.incorrectCount,
+      unattempted_count: evaluation.unattemptedCount,
+      score: evaluation.score,
+      percentage: evaluation.percentage,
+      accuracy: evaluation.accuracy,
+      time_spent_seconds: evaluation.timeSpentSeconds,
+      timestamp: evaluation.timestamp || new Date().toISOString()
+    };
+
+    // 1. Save to local storage history
+    const localKey = `nw_test_history_${userId}`;
+    let history = [];
+    try {
+      history = JSON.parse(localStorage.getItem(localKey) || "[]");
+    } catch (e) {
+      history = [];
+    }
+    history.unshift(record);
+    localStorage.setItem(localKey, JSON.stringify(history.slice(0, 50)));
+
+    // 2. Increment student profile tests_taken count
+    await this.incrementUserStats(userId, { testsTaken: 1 });
+
+    // 3. Save to Firestore if connected
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore
+          .collection(this.COLLECTION_USERS)
+          .doc(userId)
+          .collection("test_attempts")
+          .doc(attemptId)
+          .set(record);
+      } catch (err) {
+        console.warn("[DatabaseService] Could not persist test attempt to Firestore:", err);
+      }
+    }
+
+    return record;
+  }
+
+  /**
+   * Get user's recent test attempts
+   */
+  async getUserTestAttempts(userId) {
+    const localKey = `nw_test_history_${userId}`;
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore && userId && userId !== "local_student") {
+      try {
+        const snap = await fb.firestore
+          .collection(this.COLLECTION_USERS)
+          .doc(userId)
+          .collection("test_attempts")
+          .orderBy("timestamp", "desc")
+          .limit(50)
+          .get();
+        if (!snap.empty) {
+          return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+      } catch (err) {
+        console.warn("[DatabaseService] Firestore test attempts query error:", err);
+      }
+    }
+    try {
+      return JSON.parse(localStorage.getItem(localKey) || "[]");
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /**
+   * Record response for daily academic challenge
+   */
+  async recordDailyChallengeAttempt(userId, challengeId, selectedOption) {
+    const today = new Date().toISOString().split("T")[0];
+    const key = `nw_challenge_${userId}_${challengeId}`;
+    localStorage.setItem(key, String(selectedOption));
+
+    // Update daily streak
+    const streakKey = `nw_streak_${userId}`;
+    let streakData = { streakDays: 1, lastDate: today };
+    try {
+      const stored = JSON.parse(localStorage.getItem(streakKey) || "null");
+      if (stored && stored.lastDate) {
+        const last = new Date(stored.lastDate);
+        const curr = new Date(today);
+        const diffDays = Math.round((curr - last) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          streakData = { streakDays: stored.streakDays + 1, lastDate: today };
+        } else if (diffDays === 0) {
+          streakData = stored; // Already answered today
+        } else {
+          streakData = { streakDays: 1, lastDate: today };
+        }
+      }
+    } catch (e) {
+      // fallback
+    }
+    localStorage.setItem(streakKey, JSON.stringify(streakData));
+
+    // Save to Firestore if available
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore
+          .collection(this.COLLECTION_USERS)
+          .doc(userId)
+          .collection("challenge_attempts")
+          .doc(`${today}_${challengeId}`)
+          .set({
+            challenge_id: challengeId,
+            selected_option: selectedOption,
+            date: today,
+            timestamp: new Date().toISOString()
+          });
+      } catch (e) {
+        console.warn("[DatabaseService] Challenge Firestore write error:", e);
+      }
+    }
+  }
+
+  /**
+   * Get user's saved answer for a daily challenge
+   */
+  getDailyChallengeAnswer(userId, challengeId) {
+    const key = `nw_challenge_${userId}_${challengeId}`;
+    const val = localStorage.getItem(key);
+    return val !== null ? parseInt(val, 10) : null;
+  }
+
+  /**
+   * Get user's academic streak
+   */
+  getAcademicStreak(userId) {
+    const streakKey = `nw_streak_${userId}`;
+    try {
+      const stored = JSON.parse(localStorage.getItem(streakKey) || "null");
+      if (stored && stored.streakDays) {
+        return stored;
+      }
+    } catch (e) {}
+    return { streakDays: 1, lastDate: new Date().toISOString().split("T")[0] };
+  }
+
+  /**
+   * Increment user academic statistics
+   */
+  async incrementUserStats(userId, { testsTaken = 0, chaptersCompleted = 0 }) {
+    const profile = await this.getStudentProfile(userId);
+    if (!profile) return;
+
+    profile.tests_taken = (profile.tests_taken || 0) + testsTaken;
+    profile.chapters_completed = (profile.chapters_completed || 0) + chaptersCompleted;
+
+    // Save updated profile
+    await this.saveStudentProfile(userId, profile);
+  }
 
   async getAvailableTests(classLevel) {
     const classId = this.normalizeClassId(classLevel);
     const fb = window.NotesWallahFirebase;
+    let list = [];
     if (fb.isConfigured() && fb.firestore) {
       try {
         const snapshot = await fb.firestore
           .collection(this.COLLECTION_TESTS)
           .where("class_id", "==", classId)
+          .where("is_active", "==", true)
           .get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (!snapshot.empty) {
+          list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }
       } catch (e) {
         console.warn("[DatabaseService] Tests query error:", e);
       }
     }
+    if (list.length === 0) {
+      try {
+        const stored = JSON.parse(localStorage.getItem("nw_custom_tests") || "[]");
+        list = stored.filter(t => t.class_id === classId && t.is_active !== false);
+      } catch (e) {}
+    }
+    return list;
+  }
+
+  /**
+   * Admin: Create or update test document
+   */
+  async createTest(testData) {
+    const testId = testData.id || `test_${Date.now()}`;
+    const docData = {
+      id: testId,
+      class_id: this.normalizeClassId(testData.class_id),
+      subject_id: testData.subject_id || "",
+      chapter_id: testData.chapter_id || "",
+      title: (testData.title || "").trim(),
+      description: (testData.description || "").trim(),
+      test_type: testData.test_type || "chapter", // "full_syllabus" | "subject" | "chapter"
+      duration_seconds: Number(testData.duration_seconds) || (Number(testData.duration_mins || 15) * 60),
+      question_count: Number(testData.question_count) || 0,
+      difficulty: testData.difficulty || "Standard",
+      is_active: testData.is_active !== false,
+      created_at: testData.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore.collection(this.COLLECTION_TESTS).doc(testId).set(docData, { merge: true });
+      } catch (err) {
+        console.warn("[DatabaseService] Firestore test write failed:", err);
+      }
+    }
+
+    // Persist to local storage custom tests registry
+    try {
+      const stored = JSON.parse(localStorage.getItem("nw_custom_tests") || "[]");
+      const idx = stored.findIndex(t => t.id === testId);
+      if (idx >= 0) stored[idx] = docData;
+      else stored.push(docData);
+      localStorage.setItem("nw_custom_tests", JSON.stringify(stored));
+    } catch (e) {}
+
+    return docData;
+  }
+
+  /**
+   * Admin: Add question to a test's questions subcollection
+   */
+  async addQuestionToTest(testId, questionData) {
+    const questionId = questionData.id || `q_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+    const docData = {
+      id: questionId,
+      test_id: testId,
+      question: (questionData.question || "").trim(),
+      question_type: questionData.question_type || "mcq_single",
+      options: Array.isArray(questionData.options) ? questionData.options : [],
+      correct_answer: questionData.correct_answer !== undefined ? questionData.correct_answer : (questionData.correct_index !== undefined ? questionData.correct_index : 0),
+      explanation: (questionData.explanation || "").trim(),
+      concept: (questionData.concept || "").trim(),
+      marks: Number(questionData.marks) || 1,
+      order: Number(questionData.order) || 1,
+      is_active: questionData.is_active !== false,
+      created_at: new Date().toISOString()
+    };
+
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore
+          .collection(this.COLLECTION_TESTS)
+          .doc(testId)
+          .collection("questions")
+          .doc(questionId)
+          .set(docData, { merge: true });
+
+        // Update parent test question count
+        await fb.firestore
+          .collection(this.COLLECTION_TESTS)
+          .doc(testId)
+          .set({ question_count: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+      } catch (err) {
+        console.warn("[DatabaseService] Firestore question write failed:", err);
+      }
+    }
+
+    // Update local cache
+    try {
+      const key = `nw_test_questions_${testId}`;
+      const list = JSON.parse(localStorage.getItem(key) || "[]");
+      list.push(docData);
+      localStorage.setItem(key, JSON.stringify(list));
+    } catch (e) {}
+
+    return docData;
+  }
+
+  /**
+   * Fetch questions for a test
+   */
+  async getTestQuestions(testId) {
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        const snap = await fb.firestore
+          .collection(this.COLLECTION_TESTS)
+          .doc(testId)
+          .collection("questions")
+          .where("is_active", "==", true)
+          .orderBy("order", "asc")
+          .get();
+
+        if (!snap.empty) {
+          return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+      } catch (err) {
+        console.warn("[DatabaseService] Firestore questions fetch fallback:", err);
+      }
+    }
+
+    try {
+      const key = `nw_test_questions_${testId}`;
+      const local = JSON.parse(localStorage.getItem(key) || "[]");
+      if (local.length > 0) return local;
+    } catch (e) {}
+
     return [];
+  }
+
+  /**
+   * Delete a test and its questions
+   */
+  async deleteTest(testId) {
+    const fb = window.NotesWallahFirebase;
+    if (fb.isConfigured() && fb.firestore) {
+      try {
+        await fb.firestore.collection(this.COLLECTION_TESTS).doc(testId).delete();
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    try {
+      const stored = JSON.parse(localStorage.getItem("nw_custom_tests") || "[]");
+      const filtered = stored.filter(t => t.id !== testId);
+      localStorage.setItem("nw_custom_tests", JSON.stringify(filtered));
+      localStorage.removeItem(`nw_test_questions_${testId}`);
+    } catch (e) {}
+
+    return true;
   }
 
   async getChallenges(classLevel) {

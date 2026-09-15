@@ -14,6 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
 </head>
 <body>
 
@@ -122,6 +123,16 @@
             <div class="metric-label" id="metric-active-notes">Pro Notes (Active)</div>
           </div>
         </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap" style="background:#FEF3C7; color:var(--admin-gold);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div>
+            <div class="metric-val" id="metric-tests">8</div>
+            <div class="metric-label">Active Tests</div>
+          </div>
+        </div>
       </div>
 
       <!-- Admin Tabs -->
@@ -133,6 +144,10 @@
         <button type="button" class="admin-tab-btn" data-tab="notes">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           <span>Manage Pro Notes</span>
+        </button>
+        <button type="button" class="admin-tab-btn" data-tab="tests">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Test Management</span>
         </button>
         <button type="button" class="admin-tab-btn" data-tab="syllabus">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -277,6 +292,202 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- TAB: TEST MANAGEMENT (Part 5) -->
+      <div id="tab-tests" class="admin-tab-panel" style="display:none;">
+        
+        <!-- Create Test Card -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Create New Test Series</span>
+            </h3>
+            <span style="font-size:0.75rem; color:var(--admin-text-secondary);">Saved to Firestore /tests/{testId}</span>
+          </div>
+          <div class="admin-card-body">
+            <form id="form-create-test">
+              <!-- Cascading: Class -> Subject -> Chapter -->
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="test-select-class">1. Target Class <span class="required">*</span></label>
+                  <select id="test-select-class" class="form-select" required>
+                    <option value="">-- Select Class --</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="test-select-subject">2. Subject <span class="required">*</span></label>
+                  <select id="test-select-subject" class="form-select" required>
+                    <option value="">-- Select Subject --</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="test-select-chapter">3. Chapter</label>
+                  <select id="test-select-chapter" class="form-select">
+                    <option value="">-- All Chapters / Full Subject Mock --</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field" style="flex: 2;">
+                  <label for="test-input-title">Test Title <span class="required">*</span></label>
+                  <input type="text" id="test-input-title" class="form-input" placeholder="e.g. Class 10 Science: Chemical Reactions Diagnostic" required>
+                </div>
+                <div class="form-field">
+                  <label for="test-select-type">Test Type <span class="required">*</span></label>
+                  <select id="test-select-type" class="form-select" required>
+                    <option value="chapter">Chapter Test</option>
+                    <option value="subject">Subject Mock</option>
+                    <option value="full_syllabus">Full Syllabus Mock</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="test-input-duration">Duration (Minutes) <span class="required">*</span></label>
+                  <input type="number" id="test-input-duration" class="form-input" value="15" min="1" max="180" required>
+                </div>
+                <div class="form-field">
+                  <label for="test-select-difficulty">Difficulty</label>
+                  <select id="test-select-difficulty" class="form-select">
+                    <option value="Standard">Standard</option>
+                    <option value="Board Target">Board Target</option>
+                    <option value="Advanced Drill">Advanced Drill</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="test-input-desc">Test Description & Concept Coverage</label>
+                <textarea id="test-input-desc" class="form-textarea" rows="2" placeholder="Brief outline of concepts and NCERT textbook sections assessed..."></textarea>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end;">
+                <button type="submit" id="btn-save-test" class="btn btn-primary">
+                  Create Test Series
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Add Question Card -->
+        <div class="admin-card" style="margin-top: 20px;">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Add Question to Test Series</span>
+            </h3>
+            <span style="font-size:0.75rem; color:var(--admin-text-secondary);">Saved to /tests/{testId}/questions/{questionId}</span>
+          </div>
+          <div class="admin-card-body">
+            <form id="form-add-question">
+              <div class="form-field">
+                <label for="question-select-test">Select Test Series <span class="required">*</span></label>
+                <select id="question-select-test" class="form-select" required>
+                  <option value="">-- Select Test Series --</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="question-input-text">Question Statement <span class="required">*</span></label>
+                <textarea id="question-input-text" class="form-textarea" rows="2" placeholder="Enter clear NCERT textbook question statement..." required></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="q-opt-0">Option A <span class="required">*</span></label>
+                  <input type="text" id="q-opt-0" class="form-input" placeholder="Option A text" required>
+                </div>
+                <div class="form-field">
+                  <label for="q-opt-1">Option B <span class="required">*</span></label>
+                  <input type="text" id="q-opt-1" class="form-input" placeholder="Option B text" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="q-opt-2">Option C <span class="required">*</span></label>
+                  <input type="text" id="q-opt-2" class="form-input" placeholder="Option C text" required>
+                </div>
+                <div class="form-field">
+                  <label for="q-opt-3">Option D <span class="required">*</span></label>
+                  <input type="text" id="q-opt-3" class="form-input" placeholder="Option D text" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="q-select-correct">Correct Option <span class="required">*</span></label>
+                  <select id="q-select-correct" class="form-select" required>
+                    <option value="0">Option A</option>
+                    <option value="1">Option B</option>
+                    <option value="2">Option C</option>
+                    <option value="3">Option D</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="q-input-concept">Core Concept / NCERT Topic</label>
+                  <input type="text" id="q-input-concept" class="form-input" placeholder="e.g. Combustion of Magnesium (Activity 1.1)">
+                </div>
+                <div class="form-field">
+                  <label for="q-input-marks">Marks</label>
+                  <input type="number" id="q-input-marks" class="form-input" value="1" min="1" max="10">
+                </div>
+                <div class="form-field">
+                  <label for="q-input-order">Order</label>
+                  <input type="number" id="q-input-order" class="form-input" value="1" min="1">
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="q-input-explanation">NCERT Faculty Explanation & Solution</label>
+                <textarea id="q-input-explanation" class="form-textarea" rows="2" placeholder="Step-by-step reasoning shown to the student during post-test review..."></textarea>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end;">
+                <button type="submit" id="btn-save-question" class="btn btn-primary">
+                  Save Question to Test
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Existing Tests Management List -->
+        <div class="admin-card" style="margin-top: 20px;">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 2 2h12a2 2 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Configured Test Series</span>
+            </h3>
+            <span id="admin-tests-count-badge" style="font-size:0.75rem; color:var(--admin-text-secondary);">Available in student practice engine</span>
+          </div>
+          <div class="admin-card-body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Questions</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-tests-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+            <div id="admin-tests-table-empty" style="display:none; text-align:center; padding:40px 20px;">
+              <p style="color:var(--admin-text-secondary); font-size:0.9rem;">No tests created yet. Use the form above to add test series.</p>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- TAB 3: SYLLABUS MANAGEMENT -->
