@@ -144,6 +144,7 @@ val syncWebAssets = tasks.register<Copy>("syncWebAssets") {
     include("index.html", "manifest.json")
     include("css/**")
     include("js/**")
+    include("locales/**")
     include("assets/**")
     include("admin/**")
   }

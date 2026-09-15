@@ -442,7 +442,7 @@ class StudyController {
             ${icons.lock}
             <span>Unlock Pro Notes</span>
           </button>
-          <p class="study-card-fineprint">Advertisement supported • Zero XP required • Immediate access</p>
+          <p class="study-card-fineprint">Advertisement supported • Free Access • Immediate opening</p>
         `;
       } else {
         if (proNotesDesc) {

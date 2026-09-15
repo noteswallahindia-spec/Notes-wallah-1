@@ -396,16 +396,81 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // 16. Firebase Configuration Modal Form
+  // 16. Firebase Configuration Modal Form & Diagnostic Verification
   const firebaseConfigForm = document.getElementById("firebase-config-form");
+  const testFirebaseBtn = document.getElementById("btn-test-firebase-connection");
+  const configStatusBadge = document.getElementById("firebase-status-badge");
+
+  const runFirebaseDiagnosticsUI = async () => {
+    const diag = await firebaseService.verifyConnection();
+    
+    // Update Badge
+    if (configStatusBadge) {
+      if (diag.success) {
+        configStatusBadge.textContent = "Connected";
+        configStatusBadge.className = "academic-badge status-connected";
+      } else if (firebaseService.isConfigured()) {
+        configStatusBadge.textContent = "Connection Error";
+        configStatusBadge.className = "academic-badge status-error";
+      } else {
+        configStatusBadge.textContent = "Pending Setup";
+        configStatusBadge.className = "academic-badge status-pending";
+      }
+    }
+
+    // Update Live Diagnostic Checklist
+    const overallStatus = document.getElementById("fb-diag-overall-status");
+    if (overallStatus) {
+      overallStatus.textContent = diag.success ? "Active & Healthy" : (firebaseService.isConfigured() ? "Check Config" : "Ready For Setup");
+      overallStatus.className = `academic-badge ${diag.success ? "status-connected" : (firebaseService.isConfigured() ? "status-error" : "status-pending")}`;
+    }
+
+    const setItemStatus = (id, label, isOk) => {
+      const item = document.getElementById(id);
+      if (!item) return;
+      const valSpan = item.querySelector(".diag-val");
+      if (valSpan) {
+        valSpan.textContent = label;
+        valSpan.style.color = isOk ? "var(--color-status-success)" : (firebaseService.isConfigured() ? "var(--color-status-error)" : "var(--color-text-secondary)");
+      }
+    };
+
+    setItemStatus("diag-item-sdk", diag.checks.sdk ? "Loaded (v10.8.0)" : "Not Detected", diag.checks.sdk);
+    setItemStatus("diag-item-config", diag.checks.config ? "Valid Keys Present" : "Missing / Not Set", diag.checks.config);
+    setItemStatus("diag-item-app", diag.checks.app ? "Initialized" : "Uninitialized", diag.checks.app);
+    setItemStatus("diag-item-auth", diag.checks.auth ? "Available" : "Unavailable", diag.checks.auth);
+    setItemStatus("diag-item-firestore", diag.checks.firestore ? "Available" : "Unavailable", diag.checks.firestore);
+    setItemStatus("diag-item-storage", diag.checks.storage ? "Available" : "Unavailable", diag.checks.storage);
+
+    return diag;
+  };
+
+  // Populate stored values into the inputs
+  const currentConfig = firebaseService.getConfig();
+  if (currentConfig) {
+    if (document.getElementById("fb-cfg-api-key")) document.getElementById("fb-cfg-api-key").value = currentConfig.apiKey || "";
+    if (document.getElementById("fb-cfg-project-id")) document.getElementById("fb-cfg-project-id").value = currentConfig.projectId || "";
+    if (document.getElementById("fb-cfg-auth-domain")) document.getElementById("fb-cfg-auth-domain").value = currentConfig.authDomain || "";
+    if (document.getElementById("fb-cfg-storage-bucket")) document.getElementById("fb-cfg-storage-bucket").value = currentConfig.storageBucket || "";
+    if (document.getElementById("fb-cfg-app-id")) document.getElementById("fb-cfg-app-id").value = currentConfig.appId || "";
+  }
+
+  // Initial Diagnostic update
+  await runFirebaseDiagnosticsUI();
+
   if (firebaseConfigForm) {
-    firebaseConfigForm.addEventListener("submit", (e) => {
+    firebaseConfigForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const apiKey = document.getElementById("fb-cfg-api-key").value;
-      const projectId = document.getElementById("fb-cfg-project-id").value;
-      const authDomain = document.getElementById("fb-cfg-auth-domain").value;
-      const storageBucket = document.getElementById("fb-cfg-storage-bucket").value;
-      const appId = document.getElementById("fb-cfg-app-id").value;
+      const apiKey = document.getElementById("fb-cfg-api-key").value.trim();
+      const projectId = document.getElementById("fb-cfg-project-id").value.trim();
+      const authDomain = document.getElementById("fb-cfg-auth-domain").value.trim();
+      const storageBucket = document.getElementById("fb-cfg-storage-bucket").value.trim();
+      const appId = document.getElementById("fb-cfg-app-id").value.trim();
+
+      if (!apiKey || !projectId) {
+        ui.showToast("Please provide at least API Key and Project ID.", "error");
+        return;
+      }
 
       firebaseService.saveConfig({
         apiKey,
@@ -415,16 +480,63 @@ document.addEventListener("DOMContentLoaded", async () => {
         appId
       });
 
+      const diag = await runFirebaseDiagnosticsUI();
       ui.closeModal("modal-firebase-config");
-      ui.showToast("Firebase project configuration saved!", "success");
+
+      if (diag.success) {
+        ui.showToast("Firebase configured and verified successfully!", "success");
+      } else {
+        ui.showToast("Configuration saved. Please check credentials if connection fails.", "info");
+      }
     });
   }
 
-  // Populate current Firebase config in settings
-  const configStatusBadge = document.getElementById("firebase-status-badge");
-  if (configStatusBadge) {
-    const isConfigured = firebaseService.isConfigured();
-    configStatusBadge.textContent = isConfigured ? "Connected" : "Foundation Mode (Ready)";
-    configStatusBadge.className = `academic-badge ${isConfigured ? "status-connected" : ""}`;
+  if (testFirebaseBtn) {
+    testFirebaseBtn.addEventListener("click", async () => {
+      ui.showToast("Running connection diagnostics...", "info");
+      const diag = await runFirebaseDiagnosticsUI();
+      if (diag.success) {
+        ui.showToast("All Firebase services verified successfully!", "success");
+      } else if (!firebaseService.isConfigured()) {
+        ui.showToast("Credentials not configured yet. App running in local foundation mode.", "info");
+      } else {
+        ui.showToast("Verification failed. Please check your credentials.", "error");
+      }
+    });
+  }
+
+  // 17. Multilingual Architecture & Language Selector
+  const i18n = window.NotesWallahI18n;
+  const langDisplay = document.getElementById("settings-current-language-display");
+  const confirmLangBtn = document.getElementById("btn-confirm-language-change");
+
+  const syncLanguageDisplay = (lang) => {
+    if (langDisplay) {
+      langDisplay.textContent = lang === "hi" ? "हिन्दी (Hindi)" : "English";
+    }
+    const currentRadio = document.querySelector(`input[name="app_language_radio"][value="${lang}"]`);
+    if (currentRadio) {
+      currentRadio.checked = true;
+    }
+  };
+
+  if (i18n) {
+    syncLanguageDisplay(i18n.currentLanguage);
+    i18n.onLanguageChange((lang) => {
+      syncLanguageDisplay(lang);
+    });
+  }
+
+  if (confirmLangBtn && i18n) {
+    confirmLangBtn.addEventListener("click", async () => {
+      const selected = document.querySelector('input[name="app_language_radio"]:checked');
+      if (selected) {
+        const newLang = selected.value;
+        await i18n.setLanguage(newLang);
+        ui.closeModal("modal-language-selector");
+        const msg = newLang === "hi" ? "भाषा सफलतापूर्वक बदल दी गई है" : "Language updated successfully";
+        ui.showToast(msg, "success");
+      }
+    });
   }
 });
