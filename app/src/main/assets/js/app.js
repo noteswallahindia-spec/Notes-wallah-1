@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const studentLangDisplays = document.querySelectorAll(".student-lang-display");
     const studentEmailDisplays = document.querySelectorAll(".student-email-display");
     const studentAvatarCircle = document.getElementById("student-avatar-initial");
+    const topbarAvatar = document.getElementById("topbar-avatar-circle");
 
     if (user) {
       const displayName = user.name || (user.email ? user.email.split("@")[0] : "Student");
@@ -96,8 +97,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       studentLangDisplays.forEach(el => el.textContent = userLang);
       studentEmailDisplays.forEach(el => el.textContent = user.email || "");
 
+      const initialChar = displayName.charAt(0).toUpperCase() || "A";
       if (studentAvatarCircle) {
-        studentAvatarCircle.textContent = displayName.charAt(0).toUpperCase();
+        studentAvatarCircle.textContent = initialChar;
+      }
+      if (topbarAvatar) {
+        topbarAvatar.textContent = initialChar;
       }
     } else {
       studentNameDisplays.forEach(el => el.textContent = "Student");
@@ -352,6 +357,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       router.navigate(view);
     });
   });
+
+  document.querySelectorAll("[data-navigate-tab]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const tab = btn.getAttribute("data-navigate-tab");
+      router.switchTab(tab);
+    });
+  });
+
+  const topbarAvatarCircle = document.getElementById("topbar-avatar-circle");
+  if (topbarAvatarCircle) {
+    topbarAvatarCircle.addEventListener("click", () => {
+      router.switchTab("account");
+    });
+  }
 
   document.querySelectorAll("[data-open-modal]").forEach(btn => {
     btn.addEventListener("click", (e) => {

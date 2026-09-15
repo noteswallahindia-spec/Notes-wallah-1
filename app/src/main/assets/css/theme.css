@@ -10,18 +10,18 @@
 
 :root {
   /* Brand Core Colors */
-  --brand-navy-primary: #132242;
-  --brand-navy-dark: #0D1424;
-  --brand-navy-light: #1E3360;
+  --brand-navy-primary: #0F1D38;
+  --brand-navy-dark: #0A1426;
+  --brand-navy-light: #1A2E56;
   --brand-gold: #E8A33D;
   --brand-gold-hover: #D48E28;
-  --brand-gold-subtle: rgba(232, 163, 61, 0.12);
-  --brand-cream: #F7F5F0;
+  --brand-gold-subtle: rgba(232, 163, 61, 0.14);
+  --brand-cream: #F8FAFC;
   --brand-white: #FFFFFF;
 
   /* Typography System */
-  --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-family-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-display: 'Merriweather', Georgia, serif;
   
   --font-size-xs: 0.75rem;    /* 12px */
   --font-size-sm: 0.844rem;   /* 13.5px */
@@ -51,14 +51,15 @@
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
 
   /* Elevation & Shadows */
-  --shadow-sm: 0 1px 3px rgba(13, 20, 36, 0.06);
-  --shadow-md: 0 4px 12px rgba(13, 20, 36, 0.08);
-  --shadow-lg: 0 8px 24px rgba(13, 20, 36, 0.12);
+  --shadow-sm: 0 1px 3px rgba(15, 29, 56, 0.05);
+  --shadow-md: 0 4px 14px rgba(15, 29, 56, 0.06);
+  --shadow-lg: 0 10px 28px rgba(15, 29, 56, 0.1);
   --shadow-gold: 0 4px 16px rgba(232, 163, 61, 0.24);
 
   /* Transitions */
@@ -79,19 +80,19 @@
    ========================================================================== */
 :root,
 [data-theme="light"] {
-  --color-bg-canvas: #F7F5F0;          /* Warm Cream Canvas */
+  --color-bg-canvas: #F8FAFC;          /* Clean Slate White Canvas */
   --color-bg-surface: #FFFFFF;         /* Pure White Surface */
-  --color-bg-subtle: #EDEAE1;          /* Soft Cream Neutral */
+  --color-bg-subtle: #F1F5F9;          /* Soft Slate Light Neutral */
   --color-bg-elevated: #FFFFFF;
   --color-bg-input: #FFFFFF;
 
-  --color-text-primary: #132242;       /* Deep Navy Primary Text */
-  --color-text-secondary: #4A5568;     /* Muted Slate Text */
-  --color-text-muted: #718096;         /* Secondary Muted Text */
+  --color-text-primary: #0F172A;       /* Deep Slate Text */
+  --color-text-secondary: #64748B;     /* Muted Slate Text */
+  --color-text-muted: #94A3B8;         /* Secondary Muted Text */
   --color-text-inverse: #FFFFFF;
-  --color-text-accent: #C88320;        /* Readable Gold Accent */
+  --color-text-accent: #E8A33D;        /* Warm Gold Accent */
 
-  --color-border-subtle: #E4DFD5;      /* Warm border */
+  --color-border-subtle: #E2E8F0;      /* Modern Clean Border */
   --color-border-hover: #CBD5E1;
   --color-border-focus: #132242;
   --color-border-gold: rgba(232, 163, 61, 0.4);

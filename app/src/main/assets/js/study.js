@@ -112,19 +112,90 @@ class StudyController {
       });
     }
 
-    // NCERT Ebook button inside chapter detail
+    // NCERT Ebook & Custom Link button handlers inside chapter detail
     const ebookActionArea = document.getElementById("ebook-action-area");
     if (ebookActionArea) {
       ebookActionArea.addEventListener("click", (e) => {
-        const btn = e.target.closest(".btn-read-ncert-ebook");
-        if (btn) {
-          const url = btn.getAttribute("data-url");
+        const btnRead = e.target.closest(".btn-read-ncert-ebook");
+        if (btnRead) {
+          const url = btnRead.getAttribute("data-url");
           if (url && url.startsWith("http")) {
-            // Open official NCERT portal link directly
             window.open(url, "_blank", "noopener,noreferrer");
           } else {
-            window.NotesWallahUI.showToast("NCERT Ebook link is not currently accessible.", "error");
+            window.NotesWallahUI.showToast("Chapter PDF link is not currently accessible.", "error");
           }
+          return;
+        }
+
+        const btnPreview = e.target.closest(".btn-preview-in-app");
+        if (btnPreview) {
+          const url = btnPreview.getAttribute("data-url");
+          this.openPdfViewer(url);
+          return;
+        }
+
+        const btnAttach = e.target.closest(".btn-open-attach-modal");
+        if (btnAttach) {
+          const chId = btnAttach.getAttribute("data-chapter-id");
+          this.openAttachModal(chId);
+          return;
+        }
+      });
+    }
+
+    // Chapter Test button handler
+    const testActionArea = document.getElementById("chapter-test-action-area");
+    if (testActionArea) {
+      testActionArea.addEventListener("click", (e) => {
+        const btnTest = e.target.closest(".btn-start-chapter-test");
+        if (btnTest) {
+          const chId = btnTest.getAttribute("data-chapter-id");
+          if (window.NotesWallahRouter) {
+            window.NotesWallahRouter.navigate("main", "test");
+            if (window.NotesWallahTestEngine && this.currentChapter) {
+              window.NotesWallahTestEngine.openChapterTestDetail(this.currentChapter);
+            }
+          }
+        }
+      });
+    }
+
+    // Attach custom ebook modal submit handler
+    const formAttach = document.getElementById("form-attach-custom-ebook");
+    if (formAttach) {
+      formAttach.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const chId = document.getElementById("attach-ebook-chapter-id").value;
+        const linkInput = document.getElementById("attach-ebook-url-input").value.trim();
+        if (!linkInput) {
+          window.NotesWallahUI.showToast("Please enter a valid URL.", "error");
+          return;
+        }
+        try {
+          new URL(linkInput);
+        } catch {
+          window.NotesWallahUI.showToast("Please enter a valid link (starting with https://).", "error");
+          return;
+        }
+        localStorage.setItem(`nw_custom_ebook_${chId}`, linkInput);
+        window.NotesWallahUI.closeModal("modal-attach-custom-ebook");
+        window.NotesWallahUI.showToast("Custom Chapter Ebook link saved!", "success");
+        if (this.currentChapter && this.currentChapter.id === chId) {
+          this.loadChapterResources(chId);
+        }
+      });
+    }
+
+    // Remove custom ebook link button handler
+    const btnRemoveCustom = document.getElementById("btn-remove-custom-ebook");
+    if (btnRemoveCustom) {
+      btnRemoveCustom.addEventListener("click", () => {
+        const chId = document.getElementById("attach-ebook-chapter-id").value;
+        localStorage.removeItem(`nw_custom_ebook_${chId}`);
+        window.NotesWallahUI.closeModal("modal-attach-custom-ebook");
+        window.NotesWallahUI.showToast("Reverted to default official NCERT link", "info");
+        if (this.currentChapter && this.currentChapter.id === chId) {
+          this.loadChapterResources(chId);
         }
       });
     }
@@ -175,37 +246,61 @@ class StudyController {
 
       if (countBadge) countBadge.textContent = `${subjects.length} Subjects`;
 
-      // Render Subject Cards with proper vector graphics (zero emojis)
+      // Render Subject Cards matching Screenshot 2
       const icons = window.NotesWallahIcons;
       let html = "";
       for (const subject of subjects) {
-        let subjectIconSvg = icons.bookOpen;
         const subNameLower = subject.name.toLowerCase();
-        if (subNameLower.includes("science") || subNameLower.includes("physics") || subNameLower.includes("chemistry") || subNameLower.includes("biology")) {
-          subjectIconSvg = icons.science;
+        let badgeCode = "Su";
+        let badgeClass = "badge-default";
+        let defaultChapters = 8;
+        if (subNameLower.includes("physics")) {
+          badgeCode = "Ph";
+          badgeClass = "badge-physics";
+          defaultChapters = 8;
+        } else if (subNameLower.includes("chemistry")) {
+          badgeCode = "Ch";
+          badgeClass = "badge-chemistry";
+          defaultChapters = 9;
+        } else if (subNameLower.includes("biology")) {
+          badgeCode = "Bi";
+          badgeClass = "badge-biology";
+          defaultChapters = 19;
         } else if (subNameLower.includes("math")) {
-          subjectIconSvg = icons.math;
-        } else if (subNameLower.includes("social")) {
-          subjectIconSvg = icons.socialScience;
+          badgeCode = "Ma";
+          badgeClass = "badge-maths";
+          defaultChapters = 14;
         } else if (subNameLower.includes("english")) {
-          subjectIconSvg = icons.english;
-        } else if (subNameLower.includes("hindi") || subNameLower.includes("urdu")) {
-          subjectIconSvg = icons.hindi;
+          badgeCode = "En";
+          badgeClass = "badge-english";
+          defaultChapters = 8;
+        } else if (subNameLower.includes("urdu")) {
+          badgeCode = "Ur";
+          badgeClass = "badge-urdu";
+          defaultChapters = 10;
+        } else {
+          badgeCode = subject.name.substring(0, 2);
+        }
+
+        let chapCount = defaultChapters;
+        if (window.NotesWallahDatabase && window.NotesWallahDatabase.chapters) {
+          const matched = window.NotesWallahDatabase.chapters.filter(c => c.subject_id === subject.id && c.class_id === this.currentClassId);
+          if (matched.length > 0) chapCount = matched.length;
         }
 
         html += `
-          <div class="study-subject-card" data-subject-id="${subject.id}">
-            <div class="subject-card-left">
-              <div class="subject-card-icon">
-                ${subjectIconSvg}
+          <div class="clean-subject-card" data-subject-id="${subject.id}">
+            <div class="clean-subject-left">
+              <div class="subject-code-badge ${badgeClass}">
+                ${badgeCode}
               </div>
-              <div class="subject-card-text">
-                <h4 class="subject-card-title">${subject.name}</h4>
-                <p class="subject-card-meta">Official NCERT Syllabus</p>
+              <div>
+                <h4 class="subject-title-text">${subject.name}</h4>
+                <p class="subject-meta-text">${chapCount} chapters · notes + tests</p>
               </div>
             </div>
-            <div class="subject-card-right">
-              <span class="subject-chevron">${icons.chevronRight}</span>
+            <div class="subject-arrow-icon">
+              ${icons.chevronRight}
             </div>
           </div>
         `;
@@ -214,7 +309,7 @@ class StudyController {
       listContainer.innerHTML = html;
 
       // Attach click listeners to cards
-      listContainer.querySelectorAll(".study-subject-card").forEach(card => {
+      listContainer.querySelectorAll(".clean-subject-card").forEach(card => {
         card.addEventListener("click", () => {
           const subjectId = card.getAttribute("data-subject-id");
           const selected = subjects.find(s => s.id === subjectId);
@@ -300,32 +395,15 @@ class StudyController {
       let html = "";
 
       chapters.forEach((chapter, index) => {
-        const avail = availabilityList[index] || { hasEbook: false, hasProNotes: false };
-
-        const ebookBadge = avail.hasEbook
-          ? `<span class="study-pill pill-green">${icons.bookOpen} Ebook Available</span>`
-          : `<span class="study-pill pill-muted">Ebook Soon</span>`;
-
-        const proNotesBadge = avail.hasProNotes
-          ? `<span class="study-pill pill-gold">${icons.sparkle} Pro Notes</span>`
-          : `<span class="study-pill pill-muted">Notes Soon</span>`;
+        const num = chapter.chapter_number || (index + 1);
 
         html += `
-          <div class="study-chapter-card" data-chapter-id="${chapter.id}">
-            <div class="chapter-card-header">
-              <span class="chapter-badge">Chapter ${chapter.chapter_number}</span>
-              <div class="chapter-pills-row">
-                ${ebookBadge}
-                ${proNotesBadge}
-              </div>
+          <div class="clean-chapter-card" data-chapter-id="${chapter.id}">
+            <div class="clean-chapter-left">
+              <div class="chapter-number-squircle">${num}</div>
+              <h4 class="chapter-title-text">${chapter.chapter_name}</h4>
             </div>
-            <div class="chapter-card-body">
-              <h4 class="chapter-card-name">${chapter.chapter_name}</h4>
-              <div class="chapter-card-footer">
-                <span class="chapter-read-action">Open Study Materials</span>
-                <span class="chapter-card-arrow">${icons.chevronRight}</span>
-              </div>
-            </div>
+            <div class="subject-arrow-icon">${icons.chevronRight}</div>
           </div>
         `;
       });
@@ -333,7 +411,7 @@ class StudyController {
       listContainer.innerHTML = html;
 
       // Attach chapter click handlers
-      listContainer.querySelectorAll(".study-chapter-card").forEach(card => {
+      listContainer.querySelectorAll(".clean-chapter-card").forEach(card => {
         card.addEventListener("click", () => {
           const chapterId = card.getAttribute("data-chapter-id");
           const selected = chapters.find(c => c.id === chapterId);
@@ -411,23 +489,44 @@ class StudyController {
 
       const icons = window.NotesWallahIcons;
 
-      // 1. NCERT Ebook Rendering
-      // Strict rule: Only show button if a valid ebook URL exists!
-      if (ebook && ebook.ebook_url && ebook.ebook_url.startsWith("http")) {
+      // 1. NCERT Ebook & Custom Link Rendering
+      const customLink = localStorage.getItem(`nw_custom_ebook_${chapterId}`);
+      const directNcertUrl = (ebook && ebook.ebook_url && ebook.ebook_url.startsWith("http")) ? ebook.ebook_url : "";
+      const effectiveUrl = customLink || directNcertUrl;
+
+      if (effectiveUrl) {
+        let badgeHtml = customLink
+          ? `<span class="academic-badge" style="background: rgba(46, 125, 50, 0.12); color: #16A34A; margin-bottom: 10px; display: inline-flex; font-weight: 700;">Custom PDF Attached</span>`
+          : `<span class="academic-badge" style="background: rgba(15, 29, 56, 0.08); color: var(--brand-navy-primary); margin-bottom: 10px; display: inline-flex; font-weight: 700;">Official Direct NCERT PDF</span>`;
+
         ebookArea.innerHTML = `
-          <button type="button" class="btn btn-outline-primary btn-read-ncert-ebook" data-url="${ebook.ebook_url}">
-            ${icons.bookOpen}
-            <span>Read NCERT Ebook</span>
-            ${icons.externalLink}
-          </button>
-          <p class="study-card-fineprint">Opens official Government NCERT digital portal (Free public access)</p>
+          ${badgeHtml}
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button type="button" class="btn btn-primary btn-block btn-read-ncert-ebook" data-url="${effectiveUrl}">
+              ${icons.bookOpen}
+              <span>${customLink ? "Open Attached Chapter PDF" : "Open NCERT Chapter PDF"}</span>
+              ${icons.externalLink}
+            </button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button type="button" class="btn btn-outline-primary btn-sm btn-preview-in-app" data-url="${effectiveUrl}">
+                <span>In-App Viewer</span>
+              </button>
+              <button type="button" class="btn btn-outline btn-sm btn-open-attach-modal" data-chapter-id="${chapterId}">
+                <span>${customLink ? "Edit Custom Link" : "Attach Your Link"}</span>
+              </button>
+            </div>
+          </div>
+          <p class="study-card-fineprint" style="margin-top: 8px;">Exact chapter PDF • Instant direct reading • Free NCERT content</p>
         `;
       } else {
         ebookArea.innerHTML = `
-          <div class="study-notice-box">
+          <div class="study-notice-box" style="margin-bottom: 12px;">
             <span class="notice-icon">${icons.info}</span>
-            <p>NCERT Ebook is not available yet.</p>
+            <p>Official NCERT link is loading or you can attach your own chapter link below.</p>
           </div>
+          <button type="button" class="btn btn-outline btn-block btn-open-attach-modal" data-chapter-id="${chapterId}">
+            <span>Attach Your Own PDF / Drive Link</span>
+          </button>
         `;
       }
 
@@ -622,6 +721,51 @@ class StudyController {
    */
   resetToSubjects() {
     this.navigateToLevel("subjects");
+  }
+
+  /**
+   * Open the In-App PDF Viewer Modal
+   */
+  openPdfViewer(url) {
+    if (!url) return;
+    const frame = document.getElementById("in-app-pdf-frame");
+    const openDirectBtn = document.getElementById("pdf-viewer-open-direct");
+    const titleEl = document.getElementById("pdf-viewer-title");
+
+    if (titleEl && this.currentChapter) {
+      titleEl.textContent = this.currentChapter.chapter_name;
+    }
+    if (openDirectBtn) {
+      openDirectBtn.href = url;
+    }
+    if (frame) {
+      const previewUrl = url.endsWith(".pdf")
+        ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`
+        : url;
+      frame.src = previewUrl;
+    }
+    window.NotesWallahUI.openModal("modal-pdf-viewer");
+  }
+
+  /**
+   * Open Custom Ebook Link Attachment Dialog
+   */
+  openAttachModal(chapterId) {
+    const hiddenInput = document.getElementById("attach-ebook-chapter-id");
+    const urlInput = document.getElementById("attach-ebook-url-input");
+    const titleSpan = document.getElementById("attach-modal-chapter-name");
+    const removeBtn = document.getElementById("btn-remove-custom-ebook");
+
+    if (hiddenInput) hiddenInput.value = chapterId;
+    if (titleSpan && this.currentChapter) {
+      titleSpan.textContent = this.currentChapter.chapter_name;
+    }
+    const existing = localStorage.getItem(`nw_custom_ebook_${chapterId}`) || "";
+    if (urlInput) urlInput.value = existing;
+    if (removeBtn) {
+      removeBtn.style.display = existing ? "inline-flex" : "none";
+    }
+    window.NotesWallahUI.openModal("modal-attach-custom-ebook");
   }
 }
 

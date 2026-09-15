@@ -9,7 +9,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Notes Wallah - Premium Educational Application for Indian Students">
 
-  <!-- Core Theme & Stylesheets -->
+  <!-- Fonts & Core Theme -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
@@ -19,6 +22,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
 </head>
 <body>
 
@@ -294,19 +298,29 @@
     <div id="view-main" class="app-view">
       <div class="main-app-shell">
 
-        <!-- Top App Bar -->
-        <header class="app-topbar">
-          <div class="app-brand-area">
-            <!-- Official Logo Slot: user can replace with assets/logo.svg / assets/logo.png -->
-            <img src="assets/logo.png" alt="Notes Wallah" class="brand-logo-compact" onerror="this.onerror=null;this.src='assets/logo.svg';">
+        <!-- Curved Deep Navy Hero Bar (Screenshot 1) -->
+        <header class="curved-navy-hero">
+          <div class="hero-top-row">
+            <div class="hero-brand-group">
+              <img src="assets/logo.png" alt="Notes Wallah" class="hero-brand-logo" onerror="this.onerror=null;this.src='assets/logo.svg';">
+              <span class="hero-brand-title">Notes <span>Wallah</span></span>
+            </div>
+            <div class="hero-right-actions">
+              <div class="hero-xp-pill" id="header-xp-badge" title="Student XP" onclick="window.NotesWallahUI.showToast('Student XP: 20 XP Earned!', 'info')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#FCD34D"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span id="hero-xp-value">20 XP</span>
+              </div>
+              <button type="button" class="hero-icon-btn" aria-label="Notifications" onclick="window.NotesWallahUI.showToast('No new notifications at this time.')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+              <button type="button" class="hero-avatar-btn" id="hero-header-avatar" data-navigate-tab="account" aria-label="Go to Profile">
+                <span id="header-avatar-letter">A</span>
+              </button>
+            </div>
           </div>
-          <div class="topbar-actions">
-            <button type="button" id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Dark Mode">
-              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
-            <button type="button" class="icon-btn" aria-label="Notifications" onclick="window.NotesWallahUI.showToast('No new notifications at this time.')">
-              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            </button>
+          <div class="hero-greeting-block">
+            <h2 class="hero-greeting-title">Good morning, <span class="student-name-display">Aamir</span></h2>
+            <p class="hero-greeting-sub"><span class="student-class-display">Class 11</span> • <span class="student-board-display">CBSE</span> • <span class="student-medium-display">English Medium</span></p>
           </div>
         </header>
 
@@ -317,102 +331,168 @@
                SCREEN 1: HOME
                -------------------------------------------------------------- -->
           <section id="screen-home" class="tab-screen active">
-            <!-- Student Greeting Banner -->
-            <div class="student-greeting-banner">
-              <div class="greeting-text-wrap">
-                <h2>Namaste, <span class="student-name-display">Student</span></h2>
-                <p>Ready to continue your preparation?</p>
+            <!-- Home Banner Ad Space -->
+            <div class="banner-ad-pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>Home Banner Ad Space</span>
+            </div>
+
+            <!-- Streak Card -->
+            <div class="streak-card">
+              <div class="streak-badge-circle">
+                🔥
               </div>
-              <div class="student-badges">
-                <span class="academic-badge student-class-display">Class 10</span>
+              <div class="streak-info-col">
+                <h4 id="home-streak-days">0 Days</h4>
+                <p>Current streak</p>
               </div>
             </div>
 
-            <!-- Quick Access Grid -->
-            <div class="section-title-row">
+            <!-- Quick Access 8 items -->
+            <div class="section-title-row" style="margin-bottom: 12px;">
               <h3 class="section-title">Quick Access</h3>
             </div>
-            <div class="quick-access-grid">
-              <button type="button" class="quick-action-btn" data-navigate-tab="study">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <div class="clean-quick-grid">
+              <!-- 1. Test Zone -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="test">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 </div>
-                <span class="quick-action-label">Subjects</span>
+                <span class="clean-quick-label">Test Zone</span>
               </button>
-              <button type="button" class="quick-action-btn" data-navigate-tab="test">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+
+              <!-- 2. Certificates -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Certificates are awarded after completing subject mock marathons!', 'info')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
                 </div>
-                <span class="quick-action-label">Tests</span>
+                <span class="clean-quick-label">Certificates</span>
               </button>
-              <button type="button" class="quick-action-btn" data-navigate-tab="challenges">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+
+              <!-- 3. Ask Sara -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="challenges">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="16" y1="16" x2="16.01" y2="16"/></svg>
                 </div>
-                <span class="quick-action-label">Challenge</span>
+                <span class="clean-quick-label">Ask Sara</span>
               </button>
-              <button type="button" class="quick-action-btn" data-navigate-tab="account">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+
+              <!-- 4. Leaderboard -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Leaderboard rankings update every Sunday midnight!', 'info')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
                 </div>
-                <span class="quick-action-label">Profile</span>
+                <span class="clean-quick-label">Leaderboard</span>
+              </button>
+
+              <!-- 5. Pro Notes -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="study">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <span class="clean-quick-label">Pro Notes</span>
+              </button>
+
+              <!-- 6. Study Alarm -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Study Reminder set for 7:00 PM daily!', 'success')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg>
+                </div>
+                <span class="clean-quick-label">Study Alarm</span>
+              </button>
+
+              <!-- 7. Mock Papers -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="test">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <span class="clean-quick-label">Mock Papers</span>
+              </button>
+
+              <!-- 8. Study Planner -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Study Planner is synchronized with your CBSE syllabus!', 'info')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <span class="clean-quick-label">Study Planner</span>
               </button>
             </div>
 
-            <!-- Continue Studying Section (Clean Empty State) -->
+            <!-- Today & This Week Section -->
+            <div class="section-title-row" style="margin-bottom: 12px;">
+              <h3 class="section-title">Today & This Week</h3>
+            </div>
+            <div class="today-week-grid">
+              <div class="daily-navy-card" data-navigate-tab="challenges">
+                <span class="daily-navy-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  DAILY • 5Q
+                </span>
+                <h4 class="daily-navy-title">Tap to see today's chapter</h4>
+              </div>
+              <div class="weekly-clean-card" data-navigate-tab="test">
+                <div class="weekly-header-row">
+                  <span class="weekly-clean-tag">WEEKLY • 5Q</span>
+                  <span class="weekly-xp-pill">+50 XP</span>
+                </div>
+                <h4 class="weekly-clean-title">Recap Test</h4>
+              </div>
+            </div>
+
+            <!-- Continue Studying Section -->
             <div class="section-title-row">
-              <h3 class="section-title">Continue Studying</h3>
+              <h3 class="section-title" data-i18n="home.continueStudying">Continue Studying</h3>
             </div>
             <div class="empty-state">
               <div class="empty-state-icon-wrap">
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               </div>
-              <h4 class="empty-state-title">No Recent Chapters</h4>
-              <p class="empty-state-subtitle">Start reading study material from your class syllabus to track your progress here.</p>
-              <button type="button" class="btn btn-outline" data-navigate-tab="study">Browse Subjects</button>
+              <h4 class="empty-state-title" data-i18n="home.noRecentChapters">No Recent Chapters</h4>
+              <p class="empty-state-subtitle" data-i18n="home.noRecentChaptersDesc">Start reading study material from your class syllabus to track your progress here.</p>
+              <button type="button" class="btn btn-outline" data-navigate-tab="study" data-i18n="home.browseSubjects">Browse Subjects</button>
             </div>
 
             <!-- Daily & Weekly Challenge Highlights -->
             <div class="section-title-row">
-              <h3 class="section-title">Academic Challenges</h3>
-              <a href="#" class="text-link" data-navigate-tab="challenges">View All</a>
+              <h3 class="section-title" data-i18n="home.academicChallenges">Academic Challenges</h3>
+              <a href="#" class="text-link" data-navigate-tab="challenges" data-i18n="common.viewAll">View All</a>
             </div>
             <div class="feature-card challenge-card">
               <div class="card-header-row">
-                <span class="card-tag">Daily Challenge</span>
+                <span class="card-tag" data-i18n="home.dailyChallenge">Daily Challenge</span>
                 <span class="academic-badge student-class-display">Class 10</span>
               </div>
-              <h4 class="card-title">Daily Practice Problems</h4>
-              <p class="card-desc">Daily conceptual question curated by Notes Wallah faculty for your board exams.</p>
+              <h4 class="card-title" data-i18n="home.dailySubjectQuestion">Daily Subject Question</h4>
+              <p class="card-desc" data-i18n="home.dailySubjectQuestionDesc">Daily conceptual question curated by Notes Wallah faculty for your board exams.</p>
               <div style="margin-top: var(--spacing-3);">
-                <button type="button" class="btn btn-outline" style="min-height: 38px; padding: 0 14px; font-size: 0.813rem;" data-navigate-tab="challenges">Open Daily Challenge</button>
+                <button type="button" class="btn btn-outline" style="min-height: 38px; padding: 0 14px; font-size: 0.813rem;" data-navigate-tab="challenges" data-i18n="home.dailyChallenge">Open Daily Challenge</button>
               </div>
             </div>
 
-            <!-- Recommended Study (Prepared for Part 2) -->
+            <!-- Recommended Study -->
             <div class="section-title-row">
-              <h3 class="section-title">Recommended for You</h3>
+              <h3 class="section-title" data-i18n="home.recommended">Recommended for You</h3>
             </div>
             <div class="empty-state">
               <div class="empty-state-icon-wrap">
                 <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
-              <h4 class="empty-state-title">Personalized Recommendations</h4>
-              <p class="empty-state-subtitle">Curated chapters, revision formula sheets and video breakdowns will sync in Part 2.</p>
+              <h4 class="empty-state-title" data-i18n="home.recommended">Personalized Recommendations</h4>
+              <p class="empty-state-subtitle">Curated chapters, revision formula sheets and video breakdowns will sync here.</p>
             </div>
 
             <!-- Recent Activity (Clean Empty State) -->
             <div class="section-title-row">
-              <h3 class="section-title">Recent Activity</h3>
+              <h3 class="section-title" data-i18n="home.recentActivity">Recent Activity</h3>
             </div>
             <div class="empty-state">
-              <h4 class="empty-state-title">No Activity Recorded Yet</h4>
-              <p class="empty-state-subtitle">Completed tests, read notes, and challenge attempts will be logged here.</p>
+              <h4 class="empty-state-title" data-i18n="home.noActivity">No Activity Recorded Yet</h4>
+              <p class="empty-state-subtitle" data-i18n="home.noActivityDesc">Completed tests, read notes, and challenge attempts will be logged here.</p>
             </div>
 
-            <!-- Achievements (Zero XP - Milestone based) -->
+            <!-- Achievements (Milestone based) -->
             <div class="section-title-row">
-              <h3 class="section-title">Achievements</h3>
+              <h3 class="section-title" data-i18n="home.achievements">Achievements</h3>
             </div>
             <div class="feature-card">
               <div style="display: flex; gap: var(--spacing-3); align-items: center;">
@@ -420,91 +500,392 @@
                   <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 15l-2 5l9-9l-5-2l2-5l-9 9l5 2z"/></svg>
                 </div>
                 <div>
-                  <h4 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-text-primary);">Early Scholar</h4>
-                  <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Joined Notes Wallah platform and initialized study profile</p>
+                  <h4 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-text-primary);" data-i18n="home.earlyScholar">Early Scholar</h4>
+                  <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary);" data-i18n="home.earlyScholarDesc">Joined Notes Wallah platform and initialized study profile</p>
                 </div>
               </div>
             </div>
           </section>
 
           <!-- --------------------------------------------------------------
-               SCREEN 2: STUDY
+               SCREEN 2: STUDY (NCERT Academic Hierarchy)
                -------------------------------------------------------------- -->
           <section id="screen-study" class="tab-screen">
-            <div class="section-title-row">
-              <h3 class="section-title">Academic Study & Notes</h3>
-              <span class="academic-badge student-board-display">CBSE</span>
-            </div>
-
-            <!-- Architecture Notice for Part 2 continuation -->
-            <div class="feature-card" style="border-left: 4px solid var(--brand-navy-primary);">
-              <div class="card-header-row">
-                <span class="card-tag" style="color: var(--brand-navy-primary);">Study Flow Architecture</span>
-              </div>
-              <p class="card-desc" style="font-size: var(--font-size-xs);">
-                <strong>Hierarchy:</strong> Study → Subject → Chapter → Ebook / Pro Notes
-              </p>
-            </div>
-
-            <!-- Pro Notes Ad Gatekeeper Architecture Card -->
-            <div class="pro-notes-banner-card">
-              <div class="pro-badge">
-                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24" style="stroke: #0D1424;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>PRO NOTES FEATURE</span>
-              </div>
-              <h4 class="card-title">Handwritten Pro Notes</h4>
-              <p class="card-desc">
-                High-yield topper notes and revision charts. Unlocked automatically after watching an advertisement. <em>Zero XP required.</em>
-              </p>
-              <div style="margin-top: var(--spacing-3);">
-                <button type="button" class="btn btn-gold btn-open-pro-notes" data-note-id="sample_pro_notes">
-                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <span>Unlock Pro Notes</span>
+            
+            <!-- SUB-VIEW 1: SUBJECTS LIST -->
+            <div id="study-subview-subjects" class="study-subview">
+              <!-- Class & Curriculum Header Banner -->
+              <div class="study-class-banner">
+                <div class="study-class-info">
+                  <span class="academic-badge-tag">OFFICIAL NCERT</span>
+                  <h3 class="study-class-title"><span class="student-class-display study-active-class-name">Class 10</span> • <span class="student-board-display">CBSE</span></h3>
+                  <p class="study-class-subtitle">Explore subjects and official NCERT chapters</p>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btn-change-study-class" aria-label="Change academic class">
+                  Change Class
                 </button>
               </div>
+
+              <!-- Subjects Section Header -->
+              <div class="section-title-row" style="margin-top: var(--spacing-4);">
+                <h3 class="section-title">Academic Subjects</h3>
+                <span class="academic-badge" id="study-subject-count-badge">Loading...</span>
+              </div>
+
+              <!-- Loading State for Subjects -->
+              <div id="study-subjects-loading" class="study-loading-state">
+                <div class="splash-spinner"></div>
+                <p>Loading subjects...</p>
+              </div>
+
+              <!-- Error State Container -->
+              <div id="study-subjects-error" class="study-error-state" style="display: none;"></div>
+
+              <!-- Subjects List Container -->
+              <div id="study-subjects-list" class="study-subjects-grid"></div>
+
+              <!-- Empty State for Subjects -->
+              <div id="study-subjects-empty" class="empty-state" style="display: none;">
+                <div class="empty-state-icon-wrap">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <h4 class="empty-state-title">No subjects available yet.</h4>
+                <p class="empty-state-subtitle">
+                  No subjects are registered for this class in Firebase Firestore yet.
+                </p>
+              </div>
             </div>
 
-            <!-- Empty State for Subjects (Loaded from Firebase in Part 2) -->
-            <div class="empty-state">
-              <div class="empty-state-icon-wrap">
-                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <!-- SUB-VIEW 2: CHAPTERS LIST -->
+            <div id="study-subview-chapters" class="study-subview" style="display: none;">
+              <!-- Navigation Header -->
+              <div class="study-nav-header">
+                <button type="button" class="btn-back-nav" id="btn-study-back-to-subjects" aria-label="Back to Subjects">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Subjects</span>
+                </button>
+                <div class="study-nav-meta">
+                  <span class="academic-badge" id="chapters-class-badge">Class 10</span>
+                </div>
               </div>
-              <h4 class="empty-state-title">Academic Syllabus Syncing</h4>
-              <p class="empty-state-subtitle">
-                Subjects for <span class="student-class-display">Class 10</span> (<span class="student-board-display">CBSE</span>) will be loaded directly from Firebase Firestore in Part 2.
-              </p>
+
+              <!-- Subject Summary Card -->
+              <div class="study-subject-header-card">
+                <div>
+                  <h3 class="study-subject-title" id="chapters-subject-title">Science</h3>
+                  <p class="study-subject-desc" id="chapters-count-text">Official NCERT Chapters</p>
+                </div>
+              </div>
+
+              <!-- Loading State for Chapters -->
+              <div id="study-chapters-loading" class="study-loading-state" style="display: none;">
+                <div class="splash-spinner"></div>
+                <p>Loading chapters...</p>
+              </div>
+
+              <!-- Error State Container -->
+              <div id="study-chapters-error" class="study-error-state" style="display: none;"></div>
+
+              <!-- Chapters List Container -->
+              <div id="study-chapters-list" class="study-chapters-list"></div>
+
+              <!-- Empty State for Chapters -->
+              <div id="study-chapters-empty" class="empty-state" style="display: none;">
+                <div class="empty-state-icon-wrap">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <h4 class="empty-state-title">No chapters available yet.</h4>
+                <p class="empty-state-subtitle">
+                  Official syllabus chapters for this subject have not been added yet.
+                </p>
+              </div>
             </div>
+
+            <!-- SUB-VIEW 3: CHAPTER DETAIL (NCERT EBOOK & PRO NOTES) -->
+            <div id="study-subview-chapter-detail" class="study-subview" style="display: none;">
+              <!-- Navigation Header -->
+              <div class="study-nav-header">
+                <button type="button" class="btn-back-nav" id="btn-study-back-to-chapters" aria-label="Back to Chapters">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Chapters</span>
+                </button>
+                <div class="study-nav-meta">
+                  <span class="academic-badge" id="detail-class-badge">Class 10</span>
+                </div>
+              </div>
+
+              <!-- Chapter Hero Header -->
+              <div class="chapter-detail-hero">
+                <span class="chapter-num-badge" id="detail-chapter-num">Chapter 1</span>
+                <h3 class="chapter-detail-title" id="detail-chapter-title">Chemical Reactions and Equations</h3>
+                <p class="chapter-detail-meta" id="detail-subject-meta">Class 10 • Science • NCERT Official</p>
+              </div>
+
+              <!-- Loading State for Resources -->
+              <div id="study-detail-loading" class="study-loading-state" style="display: none;">
+                <div class="splash-spinner"></div>
+                <p>Loading study material...</p>
+              </div>
+
+              <!-- Resources Container -->
+              <div id="study-detail-content" class="study-detail-content">
+                
+                <!-- 1. NCERT Official Ebook Card -->
+                <div class="feature-card ebook-card">
+                  <div class="card-header-row">
+                    <span class="card-tag" style="color: var(--color-success); display: flex; align-items: center; gap: 4px;">
+                      <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      NCERT OFFICIAL TEXTBOOK
+                    </span>
+                  </div>
+                  <h4 class="card-title" id="ebook-card-title">Digital NCERT Chapter Ebook</h4>
+                  <p class="card-desc">
+                    Access the authentic Government NCERT textbook chapter directly on the official portal. Free public educational access.
+                  </p>
+                  <div id="ebook-action-area" style="margin-top: var(--spacing-3);">
+                    <!-- Injected dynamically with either Read button or 'NCERT Ebook is not available yet.' -->
+                  </div>
+                </div>
+
+                <!-- 2. Pro Notes Card (Advertisement Gatekeeper - Free Access) -->
+                <div class="pro-notes-banner-card">
+                  <div class="pro-badge">
+                    <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24" style="stroke: #0D1424;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span data-i18n="study.proNotes">TOPPER PRO NOTES</span>
+                  </div>
+                  <h4 class="card-title" id="pro-notes-card-title" data-i18n="study.proNotes">Handwritten Revision Notes</h4>
+                  <p class="card-desc" id="pro-notes-card-desc" data-i18n="study.proNotesDesc">
+                    Comprehensive handwritten revision notes with key formulas, reactions, and CBSE board examination tips. Free Access.
+                  </p>
+                  <div id="pro-notes-action-area" style="margin-top: var(--spacing-3);">
+                    <!-- Injected dynamically with either Unlock button or 'No Pro Notes available yet.' -->
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
           </section>
 
           <!-- --------------------------------------------------------------
-               SCREEN 3: TEST
+               SCREEN 3: TEST (Part 5: Complete Test System)
                -------------------------------------------------------------- -->
           <section id="screen-test" class="tab-screen">
-            <div class="section-title-row">
-              <h3 class="section-title">Test Series & Practice</h3>
-              <span class="academic-badge student-class-display">Class 10</span>
+            
+            <!-- SUB-VIEW 1: TEST HOME DASHBOARD -->
+            <div id="test-subview-home" class="test-subview">
+              <div class="section-title-row">
+                <h3 class="section-title" data-i18n="test.title">Test Series & Practice</h3>
+                <span class="academic-badge student-class-display">Class 10</span>
+              </div>
+
+              <!-- Academic Architecture Notice (Strict Zero XP) -->
+              <div class="feature-card" style="border-left: 4px solid var(--brand-gold); margin-bottom: var(--spacing-3); padding: var(--spacing-3) var(--spacing-4);">
+                <div class="card-header-row" style="margin-bottom: 2px;">
+                  <span class="card-tag" style="color: var(--brand-navy-primary);">Academic Practice Engine</span>
+                  <span class="academic-badge" style="background: rgba(46, 125, 50, 0.12); color: #2E7D32;">Zero XP • Pure Learning</span>
+                </div>
+                <p class="card-desc" style="font-size: var(--font-size-xs); margin: 0;">
+                  NCERT syllabus tests featuring timed examination modes, interactive question palettes, and faculty explanations.
+                </p>
+              </div>
+
+              <!-- 4 Primary Test Mode Selection Cards -->
+              <div class="section-title-row" style="margin-top: var(--spacing-3); margin-bottom: var(--spacing-2);">
+                <h4 class="section-title" style="font-size: var(--font-size-sm);">Practice Modes</h4>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2); margin-bottom: var(--spacing-4);">
+                <!-- 1. Full Syllabus -->
+                <div class="feature-card btn-nav-test-mode" id="btn-mode-full-syllabus" style="cursor: pointer; padding: var(--spacing-3); margin-bottom: 0; border: 1px solid var(--color-border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+                  <div>
+                    <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--brand-navy-primary); color: var(--brand-white); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-2);">
+                      <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); margin-bottom: 2px; color: var(--color-text-primary);">Full Syllabus</h4>
+                    <p style="font-size: 0.688rem; color: var(--color-text-secondary); margin: 0; line-height: 1.3;">Comprehensive board mock tests</p>
+                  </div>
+                  <span style="font-size: 0.65rem; color: var(--brand-gold); font-weight: var(--font-weight-bold); margin-top: var(--spacing-2);">Take Mock →</span>
+                </div>
+
+                <!-- 2. Subject Tests -->
+                <div class="feature-card btn-nav-test-mode" id="btn-mode-subject-tests" style="cursor: pointer; padding: var(--spacing-3); margin-bottom: 0; border: 1px solid var(--color-border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+                  <div>
+                    <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: #2E7D32; color: #FFFFFF; display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-2);">
+                      <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); margin-bottom: 2px; color: var(--color-text-primary);">Subject Tests</h4>
+                    <p style="font-size: 0.688rem; color: var(--color-text-secondary); margin: 0; line-height: 1.3;">Explore by curriculum subject</p>
+                  </div>
+                  <span style="font-size: 0.65rem; color: #2E7D32; font-weight: var(--font-weight-bold); margin-top: var(--spacing-2);">Select Subject →</span>
+                </div>
+
+                <!-- 3. Chapter Tests -->
+                <div class="feature-card btn-nav-test-mode" id="btn-mode-chapter-tests" style="cursor: pointer; padding: var(--spacing-3); margin-bottom: 0; border: 1px solid var(--color-border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+                  <div>
+                    <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--brand-gold); color: #0D1424; display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-2);">
+                      <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    </div>
+                    <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); margin-bottom: 2px; color: var(--color-text-primary);">Chapter Tests</h4>
+                    <p style="font-size: 0.688rem; color: var(--color-text-secondary); margin: 0; line-height: 1.3;">Topic-wise diagnostic drills</p>
+                  </div>
+                  <span style="font-size: 0.65rem; color: var(--brand-gold); font-weight: var(--font-weight-bold); margin-top: var(--spacing-2);">Browse Chapters →</span>
+                </div>
+
+                <!-- 4. Test History -->
+                <div class="feature-card btn-nav-test-mode" id="btn-mode-test-history" style="cursor: pointer; padding: var(--spacing-3); margin-bottom: 0; border: 1px solid var(--color-border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+                  <div>
+                    <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: #3B82F6; color: #FFFFFF; display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-2);">
+                      <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); margin-bottom: 2px; color: var(--color-text-primary);">Test History</h4>
+                    <p style="font-size: 0.688rem; color: var(--color-text-secondary); margin: 0; line-height: 1.3;">Past attempts & explanations</p>
+                  </div>
+                  <span style="font-size: 0.65rem; color: #3B82F6; font-weight: var(--font-weight-bold); margin-top: var(--spacing-2);">View Records →</span>
+                </div>
+              </div>
+
+              <!-- Recent Tests / Attempts Section -->
+              <div class="section-title-row" style="margin-top: var(--spacing-3); margin-bottom: var(--spacing-2);">
+                <h4 class="section-title" style="font-size: var(--font-size-sm);">Recent Tests & Performance</h4>
+                <button type="button" class="btn btn-link btn-sm" id="btn-view-all-history" style="font-size: var(--font-size-xs); padding: 0;">View All</button>
+              </div>
+              <div id="test-home-recent-attempts-container" style="margin-bottom: var(--spacing-4);">
+                <!-- Dynamically populated or empty state -->
+              </div>
+
+              <!-- Featured Practice Tests Section -->
+              <div class="section-title-row" style="margin-top: var(--spacing-3); margin-bottom: var(--spacing-2);">
+                <h4 class="section-title" style="font-size: var(--font-size-sm);">All Practice Tests</h4>
+                <span class="academic-badge student-class-display">Class 10</span>
+              </div>
+              <div id="test-home-filter-chips" class="test-subject-filters" style="display: flex; gap: var(--spacing-2); overflow-x: auto; padding-bottom: 6px; margin-bottom: var(--spacing-3);">
+                <!-- Dynamic subject chips -->
+              </div>
+              <div id="test-home-tests-list" style="display: flex; flex-direction: column; gap: var(--spacing-3);">
+                <!-- Dynamic test cards -->
+              </div>
             </div>
 
-            <!-- Architecture Notice for Part 3 continuation -->
-            <div class="feature-card" style="border-left: 4px solid var(--brand-navy-primary);">
-              <div class="card-header-row">
-                <span class="card-tag" style="color: var(--brand-navy-primary);">Test Flow Architecture</span>
+            <!-- SUB-VIEW 2: FULL SYLLABUS MOCK -->
+            <div id="test-subview-full-syllabus" class="test-subview" style="display: none;">
+              <div class="study-nav-header" style="margin-bottom: var(--spacing-3);">
+                <button type="button" class="btn-back-nav" id="btn-back-from-full-syllabus">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Back to Tests</span>
+                </button>
+                <div class="study-nav-meta">
+                  <span class="academic-badge student-class-display">Class 10</span>
+                </div>
               </div>
-              <p class="card-desc" style="font-size: var(--font-size-xs);">
-                <strong>Hierarchy:</strong> Test → Full Syllabus / Subject → Chapter → Test Configuration → Questions → Result → Review
-              </p>
+
+              <div class="feature-card" style="border-left: 4px solid var(--brand-navy-primary); margin-bottom: var(--spacing-4);">
+                <span class="card-tag" style="color: var(--brand-navy-primary);">BOARD BLUEPRINT SIMULATION</span>
+                <h4 class="card-title" style="margin-top: 4px; margin-bottom: 2px;">Full Syllabus Examination Mocks</h4>
+                <p class="card-desc" style="font-size: var(--font-size-xs); margin: 0;">
+                  Multi-subject comprehensive mocks timed to simulate authentic CBSE board examination criteria.
+                </p>
+              </div>
+
+              <div id="test-full-syllabus-list" style="display: flex; flex-direction: column; gap: var(--spacing-3);">
+                <!-- Populated dynamically -->
+              </div>
             </div>
 
-            <!-- Empty State for Tests (Part 3) -->
-            <div class="empty-state">
-              <div class="empty-state-icon-wrap">
-                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <!-- SUB-VIEW 3: SUBJECT SELECTION -->
+            <div id="test-subview-subjects" class="test-subview" style="display: none;">
+              <div class="study-nav-header" style="margin-bottom: var(--spacing-3);">
+                <button type="button" class="btn-back-nav" id="btn-back-from-subjects">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Back to Tests</span>
+                </button>
+                <div class="study-nav-meta">
+                  <span class="academic-badge student-class-display">Class 10</span>
+                </div>
               </div>
-              <h4 class="empty-state-title">No Mock Tests Available Yet</h4>
-              <p class="empty-state-subtitle">
-                Chapter tests, subject-wise quizzes, and full-length board mock exams will be introduced in Part 3 without mock question placeholders.
-              </p>
+
+              <div class="section-title-row" style="margin-bottom: var(--spacing-3);">
+                <div>
+                  <h3 class="section-title">Select Subject</h3>
+                  <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0;">Choose a subject to practice chapter-wise tests</p>
+                </div>
+              </div>
+
+              <div id="test-subjects-grid" class="study-subjects-grid">
+                <!-- Populated dynamically -->
+              </div>
             </div>
+
+            <!-- SUB-VIEW 4: CHAPTER SELECTION -->
+            <div id="test-subview-chapters" class="test-subview" style="display: none;">
+              <div class="study-nav-header" style="margin-bottom: var(--spacing-3);">
+                <button type="button" class="btn-back-nav" id="btn-back-from-chapters">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Back to Subjects</span>
+                </button>
+                <div class="study-nav-meta">
+                  <span class="academic-badge student-class-display">Class 10</span>
+                </div>
+              </div>
+
+              <div class="study-subject-header-card" style="margin-bottom: var(--spacing-3);">
+                <div>
+                  <h3 class="study-subject-title" id="test-chapters-subject-title">Science</h3>
+                  <p class="study-subject-desc">Select a chapter for diagnostic practice</p>
+                </div>
+              </div>
+
+              <div id="test-chapters-list" class="study-chapters-list">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- SUB-VIEW 5: CHAPTER TEST DETAIL -->
+            <div id="test-subview-chapter-detail" class="test-subview" style="display: none;">
+              <div class="study-nav-header" style="margin-bottom: var(--spacing-3);">
+                <button type="button" class="btn-back-nav" id="btn-back-from-chapter-detail">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Back to Chapters</span>
+                </button>
+                <div class="study-nav-meta">
+                  <span class="academic-badge student-class-display">Class 10</span>
+                </div>
+              </div>
+
+              <div class="chapter-detail-hero" style="margin-bottom: var(--spacing-4);">
+                <span class="chapter-num-badge" id="test-detail-chapter-num">Chapter 1</span>
+                <h3 class="chapter-detail-title" id="test-detail-chapter-title">Chemical Reactions and Equations</h3>
+                <p class="chapter-detail-meta" id="test-detail-meta">Class 10 • Diagnostic Chapter Assessment</p>
+              </div>
+
+              <div id="test-chapter-detail-content">
+                <!-- Populated dynamically with Test card or 'No test available for this chapter yet.' -->
+              </div>
+            </div>
+
+            <!-- SUB-VIEW 6: TEST HISTORY -->
+            <div id="test-subview-history" class="test-subview" style="display: none;">
+              <div class="study-nav-header" style="margin-bottom: var(--spacing-3);">
+                <button type="button" class="btn-back-nav" id="btn-back-from-history">
+                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Back to Tests</span>
+                </button>
+                <div class="study-nav-meta">
+                  <span class="academic-badge">Academic Records</span>
+                </div>
+              </div>
+
+              <div class="section-title-row" style="margin-bottom: var(--spacing-3);">
+                <div>
+                  <h3 class="section-title">Your Test Performance History</h3>
+                  <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0;">Review your past test scores, accuracy, and faculty solutions.</p>
+                </div>
+              </div>
+
+              <div id="test-history-full-list" style="display: flex; flex-direction: column; gap: var(--spacing-3);">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
           </section>
 
           <!-- --------------------------------------------------------------
@@ -512,19 +893,19 @@
                -------------------------------------------------------------- -->
           <section id="screen-challenges" class="tab-screen">
             <div class="section-title-row">
-              <h3 class="section-title">Academic Challenges</h3>
-              <span class="academic-badge" style="background: var(--brand-gold-subtle); color: var(--color-text-accent);">Zero XP</span>
+              <h3 class="section-title" data-i18n="challenges.title">Academic Challenges</h3>
+              <span class="academic-badge" style="background: var(--brand-gold-subtle); color: var(--color-text-accent);" data-i18n="challenges.curated">Curated</span>
             </div>
 
             <div class="feature-card challenge-card">
               <div class="card-header-row">
-                <span class="card-tag">Daily Challenge</span>
-                <span class="academic-badge">Today</span>
+                <span class="card-tag" data-i18n="home.dailyChallenge">Daily Challenge</span>
+                <span class="academic-badge" data-i18n="challenges.today">Today</span>
               </div>
-              <h4 class="card-title">Daily Subject Question</h4>
-              <p class="card-desc">Solve daily faculty problem to reinforce your conceptual foundation.</p>
+              <h4 class="card-title" data-i18n="home.dailySubjectQuestion">Daily Subject Question</h4>
+              <p class="card-desc" data-i18n="home.dailySubjectQuestionDesc">Solve daily faculty problem to reinforce your conceptual foundation.</p>
               <div class="empty-state" style="margin-top: var(--spacing-3); padding: var(--spacing-4);">
-                <p class="empty-state-subtitle" style="margin-bottom: 0;">Today's challenge questions are being prepared by subject mentors in Firebase.</p>
+                <p class="empty-state-subtitle" style="margin-bottom: 0;" data-i18n="challenges.preparingDaily">Today's challenge questions are being prepared by subject mentors.</p>
               </div>
             </div>
 
@@ -542,129 +923,124 @@
           </section>
 
           <!-- --------------------------------------------------------------
-               SCREEN 5: ACCOUNT
+               SCREEN 5: ACCOUNT (Clean UI Profile - Screenshot 4)
                -------------------------------------------------------------- -->
           <section id="screen-account" class="tab-screen">
-            <div class="section-title-row">
-              <h3 class="section-title">Student Account</h3>
+            <!-- Profile Hero Block -->
+            <div class="profile-hero-block">
+              <div class="profile-hero-avatar" id="student-avatar-initial">A</div>
+              <h3 class="profile-hero-name student-name-display">Aamir</h3>
+              <div class="profile-gold-dash"></div>
             </div>
 
-            <!-- Profile Summary Card -->
-            <div class="profile-card">
-              <div class="profile-avatar-circle" id="student-avatar-initial">S</div>
-              <div class="profile-info">
-                <h3 class="student-name-display">Student Name</h3>
-                <p class="student-email-display">student@example.com</p>
-                <div style="display: flex; gap: 6px; margin-top: 6px;">
-                  <span class="academic-badge student-class-display">Class 10</span>
-                  <span class="academic-badge student-board-display">CBSE</span>
-                </div>
+            <!-- Floating 3-Column Stats -->
+            <div class="profile-floating-stats">
+              <div class="stat-col">
+                <h4 id="stat-xp-coins">20</h4>
+                <p>XP Coins</p>
               </div>
-            </div>
-
-            <!-- Academic Profile Information -->
-            <div class="feature-card">
-              <div class="card-header-row">
-                <span class="card-tag">Academic Information</span>
-                <button type="button" class="text-link" data-navigate-view="onboarding">Edit Details</button>
+              <div class="stat-col" style="border-left: 1px solid var(--color-divider); border-right: 1px solid var(--color-divider);">
+                <h4 id="stat-day-streak">0</h4>
+                <p>Day Streak</p>
               </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-3); margin-top: var(--spacing-2); font-size: var(--font-size-xs);">
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Class:</span>
-                  <strong class="student-class-display" style="color: var(--color-text-primary);">Class 10</strong>
-                </div>
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Board:</span>
-                  <strong class="student-board-display" style="color: var(--color-text-primary);">CBSE</strong>
-                </div>
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Medium:</span>
-                  <strong class="student-medium-display" style="color: var(--color-text-primary);">English Medium</strong>
-                </div>
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Preferred Language:</span>
-                  <strong class="student-lang-display" style="color: var(--color-text-primary);">English</strong>
-                </div>
+              <div class="stat-col">
+                <h4 id="stat-certificates-count">0</h4>
+                <p>Certificates</p>
               </div>
             </div>
 
-            <!-- Learning Statistics Foundation (NO XP, NO LEVEL) -->
-            <div class="feature-card">
-              <div class="card-header-row">
-                <span class="card-tag">Study Statistics</span>
+            <!-- Change Class Pill Button -->
+            <button type="button" class="btn-profile-change-class" id="btn-account-change-class">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>Change Class (<span class="student-class-display">Class 11</span>)</span>
+            </button>
+
+            <!-- Group 1: Academic Records -->
+            <div class="profile-menu-card">
+              <div class="profile-menu-row" onclick="window.NotesWallahUI.showToast('Certificates will be unlocked upon finishing full subject mocks!', 'info')">
+                <div class="menu-row-left">
+                  <span>🏆</span>
+                  <span>My Certificates</span>
+                </div>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
               </div>
-              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-2); text-align: center; margin-top: var(--spacing-2);">
-                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
-                  <strong style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0</strong>
-                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Chapters Completed</span>
+              <div class="profile-menu-row" data-navigate-tab="study">
+                <div class="menu-row-left">
+                  <span>📄</span>
+                  <span>My Unlocked Notes</span>
                 </div>
-                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
-                  <strong style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0</strong>
-                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Tests Taken</span>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
-                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
-                  <strong style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0h</strong>
-                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Study Time</span>
+              </div>
+              <div class="profile-menu-row" data-navigate-tab="test">
+                <div class="menu-row-left">
+                  <span>📊</span>
+                  <span>Test History</span>
+                </div>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+              <div class="profile-menu-row" onclick="window.NotesWallahUI.showToast('Bookmarked chapters are saved in your offline storage!', 'info')">
+                <div class="menu-row-left">
+                  <span>🔖</span>
+                  <span>Bookmarked Chapters</span>
+                </div>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
               </div>
             </div>
 
-            <!-- Preferences & Settings -->
-            <div class="settings-list">
-              <!-- Dark Mode Switch -->
-              <div class="settings-item">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <!-- Group 2: Preferences & Settings -->
+            <div class="profile-menu-card">
+              <div class="profile-menu-row" data-open-modal="modal-language-selector">
+                <div class="menu-row-left">
+                  <span>🌐</span>
+                  <span>Language</span>
+                </div>
+                <div class="menu-row-right">
+                  <span id="settings-current-language-display" style="font-weight: 600; color: var(--color-text-primary);">English</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+              <div class="profile-menu-row">
+                <div class="menu-row-left">
+                  <span>🌙</span>
                   <span>Dark Mode</span>
                 </div>
-                <div class="settings-item-right">
+                <div class="menu-row-right">
                   <label class="switch">
                     <input type="checkbox" id="theme-switch-checkbox">
                     <span class="slider"></span>
                   </label>
                 </div>
               </div>
-
-              <!-- Firebase Project Integration -->
-              <div class="settings-item" data-open-modal="modal-firebase-config">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                  <span>Firebase Project Config</span>
+              <div class="profile-menu-row" data-open-modal="modal-firebase-config">
+                <div class="menu-row-left">
+                  <span>🔥</span>
+                  <span>Firebase Integration</span>
                 </div>
-                <div class="settings-item-right">
-                  <span id="firebase-status-badge" class="academic-badge">Foundation Mode</span>
-                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-                </div>
-              </div>
-
-              <!-- Notifications -->
-              <div class="settings-item">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                  <span>Study Reminders</span>
-                </div>
-                <div class="settings-item-right">
-                  <span style="color: var(--color-status-success); font-weight: 600;">Active</span>
-                </div>
-              </div>
-
-              <!-- About Notes Wallah -->
-              <div class="settings-item" onclick="window.NotesWallahUI.showToast('Notes Wallah - Part 1 of 10 Foundation Active')">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  <span>About Notes Wallah</span>
-                </div>
-                <div class="settings-item-right">
-                  <span>v1.0 (Part 1/10)</span>
+                <div class="menu-row-right">
+                  <span id="firebase-status-badge" class="academic-badge" style="background: rgba(22, 163, 74, 0.15); color: #16A34A; font-weight: 700;">Connected</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
               </div>
             </div>
 
-            <!-- Logout Button -->
-            <button type="button" id="btn-logout" class="btn btn-outline btn-block" style="color: var(--color-status-error); border-color: var(--color-border-subtle); margin-top: var(--spacing-4);">
-              <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24" style="stroke: var(--color-status-error);"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              <span>Log Out</span>
-            </button>
+            <!-- Group 3: Admin & Sign Out -->
+            <div style="padding: 0 16px 24px; display: flex; flex-direction: column; gap: 10px;">
+              <a href="admin/index.html" class="btn btn-outline btn-block" style="text-decoration: none; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>Faculty / Admin Console</span>
+              </a>
+              <button type="button" id="btn-logout" class="btn btn-outline-danger btn-block">
+                <span>Sign Out</span>
+              </button>
+            </div>
           </section>
 
         </main>
@@ -675,35 +1051,35 @@
             <span class="nav-icon-wrap">
               <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 10.2L12 3l9 7.2v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-10z"/></svg>
             </span>
-            <span class="nav-label">Home</span>
+            <span class="nav-label" data-i18n="nav.home">Home</span>
           </button>
 
           <button type="button" class="nav-item" data-tab="study" aria-label="Study">
             <span class="nav-icon-wrap">
               <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
             </span>
-            <span class="nav-label">Study</span>
+            <span class="nav-label" data-i18n="nav.study">Study</span>
           </button>
 
           <button type="button" class="nav-item" data-tab="test" aria-label="Test">
             <span class="nav-icon-wrap">
               <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </span>
-            <span class="nav-label">Test</span>
+            <span class="nav-label" data-i18n="nav.test">Test</span>
           </button>
 
           <button type="button" class="nav-item" data-tab="challenges" aria-label="Challenges">
             <span class="nav-icon-wrap">
               <svg class="icon-svg" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
             </span>
-            <span class="nav-label">Challenges</span>
+            <span class="nav-label" data-i18n="nav.challenges">Challenges</span>
           </button>
 
           <button type="button" class="nav-item" data-tab="account" aria-label="Account">
             <span class="nav-icon-wrap">
               <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </span>
-            <span class="nav-label">Account</span>
+            <span class="nav-label" data-i18n="nav.account">Account</span>
           </button>
         </nav>
 
@@ -758,18 +1134,126 @@
             <svg class="icon-svg icon-svg-lg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
           <p id="pro-notes-modal-message" style="font-size: var(--font-size-sm); color: var(--color-text-secondary); text-align: center; margin-bottom: var(--spacing-4); line-height: 1.6;">
-            Pro Notes require watching an advertisement before unlocking. In Part 1, the centralized AdService interface is established without fake ad completion.
+            Pro Notes require watching an advertisement before unlocking. In Part 2, the ad requirement is strictly separated from the ad provider without fake ad completion and with zero XP.
           </p>
-          <button type="button" class="btn btn-primary btn-block" data-close-modal="modal-pro-notes-ad">Understood</button>
+          <div style="display: flex; flex-direction: column; gap: var(--spacing-2);">
+            <button type="button" class="btn btn-gold btn-block" id="btn-preview-pro-notes-reader">
+              Preview Pro Notes Reader
+            </button>
+            <button type="button" class="btn btn-secondary btn-block" data-close-modal="modal-pro-notes-ad">
+              Dismiss
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 3. Firebase Project Configuration Modal -->
-    <div id="modal-firebase-config" class="modal-backdrop">
+    <!-- 3. Pro Notes Document Reader Modal (Part 2) -->
+    <div id="modal-pro-notes-reader" class="modal-backdrop">
+      <div class="modal-sheet" style="max-height: 90vh;">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: var(--spacing-2);">
+            <span class="pro-badge" style="margin: 0;">PRO NOTES</span>
+            <h3 class="modal-title" id="reader-note-title">Handwritten Pro Notes</h3>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="modal-pro-notes-reader" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="pro-reader-container">
+          <div class="pro-reader-meta-bar">
+            <span id="reader-note-meta" class="academic-badge">Class 10 • NCERT</span>
+            <span class="study-pill pill-gold" data-i18n="study.unlocked">Unlocked (Free Access)</span>
+          </div>
+
+          <div class="pro-reader-content">
+            <div class="pro-document-preview-box">
+              <div class="doc-badge">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Topper Verified Material</span>
+              </div>
+              <h4 id="reader-note-heading" style="font-size: var(--font-size-base); margin-bottom: var(--spacing-2); font-weight: 700;">Revision & Formula Overview</h4>
+              <p id="reader-note-desc" style="font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-4);">
+                Handwritten notes covering core concepts, exam tips, and memory maps.
+              </p>
+
+              <div class="storage-ref-box">
+                <span class="storage-ref-label">Firebase Storage Document:</span>
+                <code id="reader-storage-path" class="storage-ref-path">pro_notes/class_10/science/ch1.pdf</code>
+              </div>
+
+              <div class="pro-reader-banner-tip">
+                <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Full PDF viewer integration with Firebase Storage signed download URL is prepared for live file streaming.</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: var(--spacing-4);">
+            <button type="button" class="btn btn-primary btn-block" data-close-modal="modal-pro-notes-reader">
+              Close Document
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Class Switcher Modal (Strict Academic Filtering) -->
+    <div id="modal-change-class" class="modal-backdrop">
       <div class="modal-sheet">
         <div class="modal-header">
-          <h3 class="modal-title">Firebase Project Setup</h3>
+          <h3 class="modal-title">Select Your Academic Class</h3>
+          <button type="button" class="icon-btn" data-close-modal="modal-change-class" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <form id="class-switcher-form">
+          <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-3);">
+            Select your class. The academic syllabus and notes will be strictly filtered to this class.
+          </p>
+          <div class="class-selector-list" style="display: flex; flex-direction: column; gap: var(--spacing-2); margin-bottom: var(--spacing-4);">
+            <label class="class-select-card">
+              <input type="radio" name="switch_class_radio" value="class_9" class="class-radio-input">
+              <div class="class-select-info">
+                <span class="class-name">Class 9</span>
+                <span class="class-desc">CBSE / NCERT Secondary Foundation</span>
+              </div>
+            </label>
+
+            <label class="class-select-card">
+              <input type="radio" name="switch_class_radio" value="class_10" class="class-radio-input" checked>
+              <div class="class-select-info">
+                <span class="class-name">Class 10</span>
+                <span class="class-desc">CBSE / NCERT Secondary Board Exam</span>
+              </div>
+            </label>
+
+            <label class="class-select-card">
+              <input type="radio" name="switch_class_radio" value="class_11" class="class-radio-input">
+              <div class="class-select-info">
+                <span class="class-name">Class 11</span>
+                <span class="class-desc">CBSE / NCERT Senior Secondary Foundation</span>
+              </div>
+            </label>
+
+            <label class="class-select-card">
+              <input type="radio" name="switch_class_radio" value="class_12" class="class-radio-input">
+              <div class="class-select-info">
+                <span class="class-name">Class 12</span>
+                <span class="class-desc">CBSE / NCERT Senior Secondary Board Exam</span>
+              </div>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Confirm & Switch Class</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 5. Firebase Project Configuration Modal -->
+    <div id="modal-firebase-config" class="modal-backdrop">
+      <div class="modal-sheet" style="max-height: 90vh;">
+        <div class="modal-header">
+          <h3 class="modal-title" data-i18n="settings.firebaseConfig">Firebase Project Setup</h3>
           <button type="button" class="icon-btn" data-close-modal="modal-firebase-config" aria-label="Close">
             <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -794,11 +1278,341 @@
             <label class="form-label" for="fb-cfg-storage-bucket">Storage Bucket</label>
             <input type="text" id="fb-cfg-storage-bucket" class="form-input" style="border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm);" placeholder="notes-wallah.appspot.com">
           </div>
-          <div class="form-group" style="margin-bottom: var(--spacing-4);">
+          <div class="form-group" style="margin-bottom: var(--spacing-3);">
             <label class="form-label" for="fb-cfg-app-id">App ID</label>
             <input type="text" id="fb-cfg-app-id" class="form-input" style="border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm);" placeholder="1:123456789:web:abcdef">
           </div>
-          <button type="submit" class="btn btn-primary btn-block">Save Firebase Configuration</button>
+          
+          <div style="display: flex; gap: var(--spacing-2); margin-bottom: var(--spacing-3);">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Save Configuration</button>
+            <button type="button" id="btn-test-firebase-connection" class="btn btn-outline" style="flex: 1;">Verify Connection</button>
+          </div>
+        </form>
+
+        <!-- Live Diagnostics & Verification Container -->
+        <div id="firebase-verification-panel" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-3); margin-top: var(--spacing-2); font-size: var(--font-size-xs);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2);">
+            <strong style="color: var(--color-text-primary);">Integration Health Check</strong>
+            <span id="fb-diag-overall-status" class="academic-badge">Checking...</span>
+          </div>
+          <div id="fb-diag-checklist" style="display: flex; flex-direction: column; gap: 6px;">
+            <div id="diag-item-sdk" style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">1. Firebase Web SDK</span>
+              <span class="diag-val" style="font-weight: 600;">Loaded (v10.8.0)</span>
+            </div>
+            <div id="diag-item-config" style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">2. Project Credentials</span>
+              <span class="diag-val" style="font-weight: 600;">Not Provided</span>
+            </div>
+            <div id="diag-item-app" style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">3. Firebase App</span>
+              <span class="diag-val" style="font-weight: 600;">Uninitialized</span>
+            </div>
+            <div id="diag-item-auth" style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">4. Authentication</span>
+              <span class="diag-val" style="font-weight: 600;">Unavailable</span>
+            </div>
+            <div id="diag-item-firestore" style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">5. Firestore Database</span>
+              <span class="diag-val" style="font-weight: 600;">Unavailable</span>
+            </div>
+            <div id="diag-item-storage" style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">6. Firebase Storage</span>
+              <span class="diag-val" style="font-weight: 600;">Unavailable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Language Selection Modal -->
+    <div id="modal-language-selector" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title" data-i18n="settings.selectLanguage">Select Language</h3>
+          <button type="button" class="icon-btn" data-close-modal="modal-language-selector" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style="padding: var(--spacing-2) 0;">
+          <div class="language-options-list" style="display: flex; flex-direction: column; gap: var(--spacing-2); margin-bottom: var(--spacing-4);">
+            <label class="class-select-card language-radio-card" data-lang="en">
+              <input type="radio" name="app_language_radio" value="en" class="class-radio-input" checked>
+              <div class="class-select-info">
+                <span class="class-name">English</span>
+                <span class="class-desc">Primary user interface language</span>
+              </div>
+            </label>
+            <label class="class-select-card language-radio-card" data-lang="hi">
+              <input type="radio" name="app_language_radio" value="hi" class="class-radio-input">
+              <div class="class-select-info">
+                <span class="class-name">हिन्दी (Hindi)</span>
+                <span class="class-desc">हिंदी इंटरफ़ेस और अध्ययन नेविगेशन</span>
+              </div>
+            </label>
+          </div>
+          <button type="button" id="btn-confirm-language-change" class="btn btn-primary btn-block" data-i18n="common.save">Save Language</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Test Configuration Modal -->
+    <div id="modal-test-config" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title" id="test-config-modal-title">Test Configuration</h3>
+          <button type="button" class="icon-btn" data-close-modal="modal-test-config" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style="padding: var(--spacing-2) 0;">
+          <p id="test-config-modal-desc" style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-3);"></p>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2); margin-bottom: var(--spacing-4);">
+            <div style="background: var(--color-bg-subtle); padding: var(--spacing-3); border-radius: var(--radius-md); text-align: center;">
+              <span style="font-size: 0.688rem; color: var(--color-text-secondary); display: block;">Questions</span>
+              <strong id="test-config-qcount" style="font-size: var(--font-size-sm); color: var(--color-text-primary);">10 Questions</strong>
+            </div>
+            <div style="background: var(--color-bg-subtle); padding: var(--spacing-3); border-radius: var(--radius-md); text-align: center;">
+              <span style="font-size: 0.688rem; color: var(--color-text-secondary); display: block;">Duration</span>
+              <strong id="test-config-duration" style="font-size: var(--font-size-sm); color: var(--color-text-primary);">15 Minutes</strong>
+            </div>
+          </div>
+
+          <label class="form-label" style="margin-bottom: var(--spacing-2); display: block;">Select Examination Mode:</label>
+          <div style="display: flex; flex-direction: column; gap: var(--spacing-2); margin-bottom: var(--spacing-4);">
+            <label class="class-select-card" style="margin: 0;">
+              <input type="radio" name="test_mode_radio" value="timed" class="class-radio-input" checked>
+              <div class="class-select-info">
+                <span class="class-name">Timed Examination Mode</span>
+                <span class="class-desc">Live countdown timer simulating CBSE board exam test pressure.</span>
+              </div>
+            </label>
+            <label class="class-select-card" style="margin: 0;">
+              <input type="radio" name="test_mode_radio" value="practice" class="class-radio-input">
+              <div class="class-select-info">
+                <span class="class-name">Self-Paced Practice Mode</span>
+                <span class="class-desc">Untimed practice allowing relaxed concept revision.</span>
+              </div>
+            </label>
+          </div>
+
+          <button type="button" id="btn-confirm-start-test" class="btn btn-primary btn-block">Begin Test Now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Interactive Test Taking Runner Modal -->
+    <div id="modal-test-runner" class="modal-backdrop">
+      <div class="modal-sheet" style="max-height: 95vh; display: flex; flex-direction: column; padding: 0;">
+        <!-- Runner Topbar -->
+        <div style="padding: var(--spacing-3) var(--spacing-4); border-bottom: 1px solid var(--color-border-subtle); display: flex; align-items: center; justify-content: space-between; background: var(--color-bg-surface); border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl);">
+          <div>
+            <h4 id="test-runner-title" style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin: 0; color: var(--color-text-primary);">Class 10 Science Test</h4>
+            <span id="test-runner-concept-badge" style="font-size: 0.65rem; color: var(--color-text-secondary);">NCERT Syllabus</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+            <div style="display: flex; align-items: center; gap: 4px; background: var(--color-bg-subtle); padding: 4px 10px; border-radius: var(--radius-full);">
+              <span style="font-size: 0.75rem;">⏱️</span>
+              <strong id="test-runner-timer" style="font-size: var(--font-size-xs); font-family: monospace;">15:00</strong>
+            </div>
+            <button type="button" class="icon-btn" data-close-modal="modal-test-runner" aria-label="Exit Test">
+              <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Palette Container (Pills) -->
+        <div style="padding: var(--spacing-2) var(--spacing-4); background: var(--color-bg-subtle); border-bottom: 1px solid var(--color-border-subtle); overflow-x: auto; white-space: nowrap;">
+          <div id="test-palette-container" style="display: flex; gap: 6px;"></div>
+        </div>
+
+        <!-- Question Content Body (Scrollable) -->
+        <div style="flex: 1; overflow-y: auto; padding: var(--spacing-4);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2);">
+            <span id="test-runner-qcounter" class="academic-badge" style="font-size: 0.688rem;">Question 1 of 5</span>
+            <button type="button" id="btn-test-mark-review" class="btn btn-outline btn-sm" style="padding: 4px 10px; font-size: 0.688rem;">
+              ☆ Mark for Review
+            </button>
+          </div>
+
+          <div id="test-runner-question-statement" style="font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary); line-height: 1.5; margin-bottom: var(--spacing-4); padding: var(--spacing-3); background: var(--color-bg-subtle); border-radius: var(--radius-md); border-left: 3px solid var(--brand-navy-primary);">
+            Loading question...
+          </div>
+
+          <div id="test-runner-options" style="display: flex; flex-direction: column; gap: var(--spacing-2);">
+            <!-- Dynamic option choices -->
+          </div>
+        </div>
+
+        <!-- Runner Bottom Control Bar -->
+        <div style="padding: var(--spacing-3) var(--spacing-4); border-top: 1px solid var(--color-border-subtle); display: flex; align-items: center; justify-content: space-between; background: var(--color-bg-surface); border-bottom-left-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl);">
+          <button type="button" id="btn-test-prev" class="btn btn-outline btn-sm" style="padding: 6px 12px; font-size: var(--font-size-xs);">
+            ← Previous
+          </button>
+          <div style="display: flex; gap: var(--spacing-2);">
+            <button type="button" id="btn-test-clear" class="btn btn-outline btn-sm" style="padding: 6px 12px; font-size: var(--font-size-xs);">
+              Clear
+            </button>
+            <button type="button" id="btn-test-next" class="btn btn-secondary btn-sm" style="padding: 6px 14px; font-size: var(--font-size-xs);">
+              Next Question →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Submit Confirmation Modal -->
+    <div id="modal-test-submit-confirm" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title">Submit Examination</h3>
+          <button type="button" class="icon-btn" data-close-modal="modal-test-submit-confirm" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style="padding: var(--spacing-2) 0;">
+          <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-2);">
+            Are you sure you want to finish this test session? Your responses will be evaluated against NCERT faculty standards.
+          </p>
+
+          <div id="test-submit-summary"></div>
+
+          <div style="display: flex; gap: var(--spacing-2); margin-top: var(--spacing-3);">
+            <button type="button" class="btn btn-outline" style="flex: 1;" data-close-modal="modal-test-submit-confirm">
+              Return to Test
+            </button>
+            <button type="button" id="btn-confirm-test-submission" class="btn btn-primary" style="flex: 1;">
+              Confirm Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Comprehensive Test Result & Review Modal -->
+    <div id="modal-test-result" class="modal-backdrop">
+      <div class="modal-sheet" style="max-height: 92vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title">Test Performance & Review</h3>
+            <span id="test-result-title" style="font-size: var(--font-size-xs); color: var(--color-text-secondary); display: block;"></span>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="modal-test-result" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; padding: var(--spacing-2) 0;">
+          <!-- Score Summary Banner -->
+          <div style="background: linear-gradient(135deg, var(--brand-navy-primary), var(--brand-navy-dark)); color: var(--brand-white); border-radius: var(--radius-lg); padding: var(--spacing-4); text-align: center; margin-bottom: var(--spacing-4);">
+            <span style="font-size: 0.688rem; text-transform: uppercase; letter-spacing: 1px; color: var(--brand-gold);">Official Evaluation</span>
+            <h2 id="result-score-number" style="font-size: 2.2rem; font-weight: var(--font-weight-heavy); margin: var(--spacing-1) 0; color: var(--brand-white);">
+              8/10
+            </h2>
+            <div style="display: flex; justify-content: center; gap: var(--spacing-2); align-items: center;">
+              <span id="result-score-percent" style="font-size: var(--font-size-sm); color: var(--brand-gold);">80% Score</span>
+              <span id="result-status-badge" class="academic-badge status-connected" style="font-size: 0.65rem;">Excellent Mastery</span>
+            </div>
+          </div>
+
+          <!-- Performance Metrics Breakdown Grid -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-2); text-align: center; margin-bottom: var(--spacing-4);">
+            <div style="background: var(--color-bg-subtle); padding: var(--spacing-2); border-radius: var(--radius-sm);">
+              <strong id="result-metric-correct" style="color: #2E7D32; display: block; font-size: var(--font-size-sm);">8</strong>
+              <span style="font-size: 0.625rem; color: var(--color-text-secondary);">Correct</span>
+            </div>
+            <div style="background: var(--color-bg-subtle); padding: var(--spacing-2); border-radius: var(--radius-sm);">
+              <strong id="result-metric-incorrect" style="color: #D32F2F; display: block; font-size: var(--font-size-sm);">2</strong>
+              <span style="font-size: 0.625rem; color: var(--color-text-secondary);">Incorrect</span>
+            </div>
+            <div style="background: var(--color-bg-subtle); padding: var(--spacing-2); border-radius: var(--radius-sm);">
+              <strong id="result-metric-unattempted" style="color: var(--color-text-secondary); display: block; font-size: var(--font-size-sm);">0</strong>
+              <span style="font-size: 0.625rem; color: var(--color-text-secondary);">Skipped</span>
+            </div>
+            <div style="background: var(--color-bg-subtle); padding: var(--spacing-2); border-radius: var(--radius-sm);">
+              <strong id="result-metric-accuracy" style="color: var(--brand-gold); display: block; font-size: var(--font-size-sm);">80%</strong>
+              <span style="font-size: 0.625rem; color: var(--color-text-secondary);">Accuracy</span>
+            </div>
+          </div>
+
+          <!-- Review Heading -->
+          <div class="section-title-row" style="margin-bottom: var(--spacing-2);">
+            <h4 class="section-title" style="font-size: var(--font-size-sm);">Question-by-Question NCERT Solution Review</h4>
+          </div>
+
+          <!-- Question Review List -->
+          <div id="test-review-questions-list"></div>
+        </div>
+
+        <div style="padding-top: var(--spacing-3); border-top: 1px solid var(--color-border-subtle); display: flex; gap: var(--spacing-2);">
+          <button type="button" class="btn btn-outline" style="flex: 1;" data-close-modal="modal-test-result">
+            Close Review
+          </button>
+          <button type="button" id="btn-retake-test" class="btn btn-primary" style="flex: 1;">
+            Retake Test
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. In-App NCERT / Chapter PDF Viewer Modal -->
+    <div id="modal-pdf-viewer" class="modal-backdrop">
+      <div class="modal-dialog modal-dialog-lg" style="height: 85vh; display: flex; flex-direction: column; background: var(--color-bg-surface); border-radius: var(--radius-lg); overflow: hidden; margin: auto; max-width: 600px; width: 95%;">
+        <div class="modal-header" style="padding: 16px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span class="academic-badge" style="font-size: 0.65rem; background: rgba(15, 29, 56, 0.08); color: var(--brand-navy-primary);">Direct Chapter Reader</span>
+            <h3 class="modal-title" id="pdf-viewer-title" style="font-size: var(--font-size-sm); margin: 4px 0 0; color: var(--color-text-primary);">Chapter PDF</h3>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="modal-pdf-viewer" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body" style="flex: 1; padding: 0; position: relative; background: #525659;">
+          <iframe id="in-app-pdf-frame" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+        <div class="modal-footer" style="padding: 12px 16px; border-top: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-surface);">
+          <a id="pdf-viewer-open-direct" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+            <span>Open in Browser / Download</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+          <button type="button" class="btn btn-primary btn-sm" data-close-modal="modal-pdf-viewer">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. Attach Custom Chapter Ebook Link Modal -->
+    <div id="modal-attach-custom-ebook" class="modal-backdrop">
+      <div class="modal-sheet" style="max-width: 500px; margin: auto;">
+        <div class="modal-header">
+          <div>
+            <span class="academic-badge" style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.15); color: #B45309;">Personal Study Material</span>
+            <h3 class="modal-title" style="margin-top: 4px;">Attach Chapter PDF Link</h3>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="modal-attach-custom-ebook" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <form id="form-attach-custom-ebook">
+          <input type="hidden" id="attach-ebook-chapter-id">
+          <div style="padding: 12px 0;">
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); line-height: 1.4; margin-bottom: 14px;">
+              Paste your exact PDF URL, Google Drive public link, or school digital resource for <strong id="attach-modal-chapter-name" style="color: var(--color-text-primary);">this chapter</strong>. It will be saved directly on your device.
+            </p>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" for="attach-ebook-url-input" style="font-size: var(--font-size-xs); font-weight: 600; display: block; margin-bottom: 6px;">Direct PDF or Drive URL</label>
+              <input type="url" id="attach-ebook-url-input" class="form-input" style="width: 100%; padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle);" placeholder="https://example.com/chapter-notes.pdf" required>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--color-border-subtle);">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-remove-custom-ebook" style="color: #DC2626; border-color: rgba(220, 38, 38, 0.3); display: none;">
+              Revert to NCERT
+            </button>
+            <div style="display: flex; gap: 8px; margin-left: auto;">
+              <button type="button" class="btn btn-outline btn-sm" data-close-modal="modal-attach-custom-ebook">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm">Save Link</button>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -808,13 +1622,21 @@
 
   </div>
 
+  <!-- Multilingual Dictionaries and Engine -->
+  <script src="locales/en.js"></script>
+  <script src="locales/hi.js"></script>
+  <script src="js/i18n.js"></script>
+
   <!-- Application Logic Modules -->
   <script src="js/firebase.js"></script>
   <script src="js/database.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/adService.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/study.js"></script>
+  <script src="js/testEngine.js"></script>
   <script src="js/router.js"></script>
   <script src="js/app.js"></script>
 

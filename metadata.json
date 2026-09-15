@@ -1,6 +1,6 @@
 {
   "name": "Notes Wallah",
-  "description": "Educational platform for Indian students - Part 5 Academic Test System (Test Hub, Full Syllabus, Subjects, Chapters, Diagnostic Execution, Result Review)",
+  "description": "Educational platform for Indian students with Clean UI, Class 9-12 NCERT curriculum, chapter-wise exact PDF ebooks, custom notes attachment, and Firebase integration.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

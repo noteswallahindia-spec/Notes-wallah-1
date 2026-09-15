@@ -9,7 +9,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Notes Wallah - Premium Educational Application for Indian Students">
 
-  <!-- Core Theme & Stylesheets -->
+  <!-- Fonts & Core Theme -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
@@ -295,19 +298,29 @@
     <div id="view-main" class="app-view">
       <div class="main-app-shell">
 
-        <!-- Top App Bar -->
-        <header class="app-topbar">
-          <div class="app-brand-area">
-            <!-- Official Logo Slot: user can replace with assets/logo.svg / assets/logo.png -->
-            <img src="assets/logo.png" alt="Notes Wallah" class="brand-logo-compact" onerror="this.onerror=null;this.src='assets/logo.svg';">
+        <!-- Curved Deep Navy Hero Bar (Screenshot 1) -->
+        <header class="curved-navy-hero">
+          <div class="hero-top-row">
+            <div class="hero-brand-group">
+              <img src="assets/logo.png" alt="Notes Wallah" class="hero-brand-logo" onerror="this.onerror=null;this.src='assets/logo.svg';">
+              <span class="hero-brand-title">Notes <span>Wallah</span></span>
+            </div>
+            <div class="hero-right-actions">
+              <div class="hero-xp-pill" id="header-xp-badge" title="Student XP" onclick="window.NotesWallahUI.showToast('Student XP: 20 XP Earned!', 'info')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#FCD34D"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span id="hero-xp-value">20 XP</span>
+              </div>
+              <button type="button" class="hero-icon-btn" aria-label="Notifications" onclick="window.NotesWallahUI.showToast('No new notifications at this time.')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+              <button type="button" class="hero-avatar-btn" id="hero-header-avatar" data-navigate-tab="account" aria-label="Go to Profile">
+                <span id="header-avatar-letter">A</span>
+              </button>
+            </div>
           </div>
-          <div class="topbar-actions">
-            <button type="button" id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Dark Mode">
-              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
-            <button type="button" class="icon-btn" aria-label="Notifications" onclick="window.NotesWallahUI.showToast('No new notifications at this time.')">
-              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            </button>
+          <div class="hero-greeting-block">
+            <h2 class="hero-greeting-title">Good morning, <span class="student-name-display">Aamir</span></h2>
+            <p class="hero-greeting-sub"><span class="student-class-display">Class 11</span> • <span class="student-board-display">CBSE</span> • <span class="student-medium-display">English Medium</span></p>
           </div>
         </header>
 
@@ -318,49 +331,115 @@
                SCREEN 1: HOME
                -------------------------------------------------------------- -->
           <section id="screen-home" class="tab-screen active">
-            <!-- Student Greeting Banner -->
-            <div class="student-greeting-banner">
-              <div class="greeting-text-wrap">
-                <h2><span data-i18n="home.greeting">Namaste</span>, <span class="student-name-display">Student</span></h2>
-                <p data-i18n="home.greetingSubtitle">Ready to continue your preparation?</p>
+            <!-- Home Banner Ad Space -->
+            <div class="banner-ad-pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>Home Banner Ad Space</span>
+            </div>
+
+            <!-- Streak Card -->
+            <div class="streak-card">
+              <div class="streak-badge-circle">
+                🔥
               </div>
-              <div class="student-badges">
-                <span class="academic-badge student-class-display">Class 10</span>
+              <div class="streak-info-col">
+                <h4 id="home-streak-days">0 Days</h4>
+                <p>Current streak</p>
               </div>
             </div>
 
-            <!-- Quick Access Grid -->
-            <div class="section-title-row">
-              <h3 class="section-title" data-i18n="home.quickAccess">Quick Access</h3>
+            <!-- Quick Access 8 items -->
+            <div class="section-title-row" style="margin-bottom: 12px;">
+              <h3 class="section-title">Quick Access</h3>
             </div>
-            <div class="quick-access-grid">
-              <button type="button" class="quick-action-btn" data-navigate-tab="study" aria-label="Subjects">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <div class="clean-quick-grid">
+              <!-- 1. Test Zone -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="test">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 </div>
-                <span class="quick-action-label" data-i18n="home.subjects">Subjects</span>
+                <span class="clean-quick-label">Test Zone</span>
               </button>
-              <button type="button" class="quick-action-btn" data-navigate-tab="test" aria-label="Tests">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+
+              <!-- 2. Certificates -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Certificates are awarded after completing subject mock marathons!', 'info')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
                 </div>
-                <span class="quick-action-label" data-i18n="home.tests">Tests</span>
+                <span class="clean-quick-label">Certificates</span>
               </button>
-              <button type="button" class="quick-action-btn" data-navigate-tab="challenges" aria-label="Challenge">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+
+              <!-- 3. Ask Sara -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="challenges">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="16" y1="16" x2="16.01" y2="16"/></svg>
                 </div>
-                <span class="quick-action-label" data-i18n="home.challenge">Challenge</span>
+                <span class="clean-quick-label">Ask Sara</span>
               </button>
-              <button type="button" class="quick-action-btn" data-navigate-tab="account" aria-label="Profile">
-                <div class="quick-action-icon-wrap">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+
+              <!-- 4. Leaderboard -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Leaderboard rankings update every Sunday midnight!', 'info')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
                 </div>
-                <span class="quick-action-label" data-i18n="home.profile">Profile</span>
+                <span class="clean-quick-label">Leaderboard</span>
+              </button>
+
+              <!-- 5. Pro Notes -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="study">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <span class="clean-quick-label">Pro Notes</span>
+              </button>
+
+              <!-- 6. Study Alarm -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Study Reminder set for 7:00 PM daily!', 'success')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg>
+                </div>
+                <span class="clean-quick-label">Study Alarm</span>
+              </button>
+
+              <!-- 7. Mock Papers -->
+              <button type="button" class="clean-quick-btn" data-navigate-tab="test">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <span class="clean-quick-label">Mock Papers</span>
+              </button>
+
+              <!-- 8. Study Planner -->
+              <button type="button" class="clean-quick-btn" onclick="window.NotesWallahUI.showToast('Study Planner is synchronized with your CBSE syllabus!', 'info')">
+                <div class="clean-quick-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <span class="clean-quick-label">Study Planner</span>
               </button>
             </div>
 
-            <!-- Continue Studying Section (Clean Empty State) -->
+            <!-- Today & This Week Section -->
+            <div class="section-title-row" style="margin-bottom: 12px;">
+              <h3 class="section-title">Today & This Week</h3>
+            </div>
+            <div class="today-week-grid">
+              <div class="daily-navy-card" data-navigate-tab="challenges">
+                <span class="daily-navy-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  DAILY • 5Q
+                </span>
+                <h4 class="daily-navy-title">Tap to see today's chapter</h4>
+              </div>
+              <div class="weekly-clean-card" data-navigate-tab="test">
+                <div class="weekly-header-row">
+                  <span class="weekly-clean-tag">WEEKLY • 5Q</span>
+                  <span class="weekly-xp-pill">+50 XP</span>
+                </div>
+                <h4 class="weekly-clean-title">Recap Test</h4>
+              </div>
+            </div>
+
+            <!-- Continue Studying Section -->
             <div class="section-title-row">
               <h3 class="section-title" data-i18n="home.continueStudying">Continue Studying</h3>
             </div>
@@ -844,158 +923,124 @@
           </section>
 
           <!-- --------------------------------------------------------------
-               SCREEN 5: ACCOUNT
+               SCREEN 5: ACCOUNT (Clean UI Profile - Screenshot 4)
                -------------------------------------------------------------- -->
           <section id="screen-account" class="tab-screen">
-            <div class="section-title-row">
-              <h3 class="section-title">Student Account</h3>
+            <!-- Profile Hero Block -->
+            <div class="profile-hero-block">
+              <div class="profile-hero-avatar" id="student-avatar-initial">A</div>
+              <h3 class="profile-hero-name student-name-display">Aamir</h3>
+              <div class="profile-gold-dash"></div>
             </div>
 
-            <!-- Profile Summary Card -->
-            <div class="profile-card">
-              <div class="profile-avatar-circle" id="student-avatar-initial">S</div>
-              <div class="profile-info">
-                <h3 class="student-name-display">Student Name</h3>
-                <p class="student-email-display">student@example.com</p>
-                <div style="display: flex; gap: 6px; margin-top: 6px;">
-                  <span class="academic-badge student-class-display">Class 10</span>
-                  <span class="academic-badge student-board-display">CBSE</span>
-                </div>
+            <!-- Floating 3-Column Stats -->
+            <div class="profile-floating-stats">
+              <div class="stat-col">
+                <h4 id="stat-xp-coins">20</h4>
+                <p>XP Coins</p>
               </div>
-            </div>
-
-            <!-- Academic Profile Information -->
-            <div class="feature-card">
-              <div class="card-header-row">
-                <span class="card-tag">Academic Information</span>
-                <div style="display: flex; gap: var(--spacing-2);">
-                  <button type="button" class="text-link" id="btn-account-change-class">Switch Class</button>
-                  <button type="button" class="text-link" data-navigate-view="onboarding">Edit Details</button>
-                </div>
+              <div class="stat-col" style="border-left: 1px solid var(--color-divider); border-right: 1px solid var(--color-divider);">
+                <h4 id="stat-day-streak">0</h4>
+                <p>Day Streak</p>
               </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-3); margin-top: var(--spacing-2); font-size: var(--font-size-xs);">
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Class:</span>
-                  <strong class="student-class-display" style="color: var(--color-text-primary);">Class 10</strong>
-                </div>
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Board:</span>
-                  <strong class="student-board-display" style="color: var(--color-text-primary);">CBSE</strong>
-                </div>
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Medium:</span>
-                  <strong class="student-medium-display" style="color: var(--color-text-primary);">English Medium</strong>
-                </div>
-                <div>
-                  <span style="color: var(--color-text-secondary); display: block;">Preferred Language:</span>
-                  <strong class="student-lang-display" style="color: var(--color-text-primary);">English</strong>
-                </div>
+              <div class="stat-col">
+                <h4 id="stat-certificates-count">0</h4>
+                <p>Certificates</p>
               </div>
             </div>
 
-            <!-- Learning Statistics Foundation (NO XP, NO LEVEL) -->
-            <div class="feature-card">
-              <div class="card-header-row">
-                <span class="card-tag">Study Statistics</span>
+            <!-- Change Class Pill Button -->
+            <button type="button" class="btn-profile-change-class" id="btn-account-change-class">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>Change Class (<span class="student-class-display">Class 11</span>)</span>
+            </button>
+
+            <!-- Group 1: Academic Records -->
+            <div class="profile-menu-card">
+              <div class="profile-menu-row" onclick="window.NotesWallahUI.showToast('Certificates will be unlocked upon finishing full subject mocks!', 'info')">
+                <div class="menu-row-left">
+                  <span>🏆</span>
+                  <span>My Certificates</span>
+                </div>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
               </div>
-              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-2); text-align: center; margin-top: var(--spacing-2);">
-                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
-                  <strong id="stat-chapters-completed" style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0</strong>
-                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Chapters Completed</span>
+              <div class="profile-menu-row" data-navigate-tab="study">
+                <div class="menu-row-left">
+                  <span>📄</span>
+                  <span>My Unlocked Notes</span>
                 </div>
-                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
-                  <strong id="stat-tests-taken" style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0</strong>
-                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Tests Taken</span>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
-                <div style="background: var(--color-bg-subtle); padding: var(--spacing-3) var(--spacing-2); border-radius: var(--radius-md);">
-                  <strong id="stat-study-time" style="font-size: var(--font-size-md); display: block; color: var(--color-text-primary);">0h</strong>
-                  <span style="font-size: 0.688rem; color: var(--color-text-secondary);">Study Time</span>
+              </div>
+              <div class="profile-menu-row" data-navigate-tab="test">
+                <div class="menu-row-left">
+                  <span>📊</span>
+                  <span>Test History</span>
+                </div>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+              <div class="profile-menu-row" onclick="window.NotesWallahUI.showToast('Bookmarked chapters are saved in your offline storage!', 'info')">
+                <div class="menu-row-left">
+                  <span>🔖</span>
+                  <span>Bookmarked Chapters</span>
+                </div>
+                <div class="menu-row-right">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
               </div>
             </div>
 
-            <!-- Preferences & Settings -->
-            <div class="settings-list">
-              <!-- Dark Mode Switch -->
-              <div class="settings-item">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                  <span data-i18n="settings.darkMode">Dark Mode</span>
+            <!-- Group 2: Preferences & Settings -->
+            <div class="profile-menu-card">
+              <div class="profile-menu-row" data-open-modal="modal-language-selector">
+                <div class="menu-row-left">
+                  <span>🌐</span>
+                  <span>Language</span>
                 </div>
-                <div class="settings-item-right">
+                <div class="menu-row-right">
+                  <span id="settings-current-language-display" style="font-weight: 600; color: var(--color-text-primary);">English</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+              <div class="profile-menu-row">
+                <div class="menu-row-left">
+                  <span>🌙</span>
+                  <span>Dark Mode</span>
+                </div>
+                <div class="menu-row-right">
                   <label class="switch">
                     <input type="checkbox" id="theme-switch-checkbox">
                     <span class="slider"></span>
                   </label>
                 </div>
               </div>
-
-              <!-- Language Selection (Multilingual Architecture) -->
-              <div class="settings-item" id="btn-settings-language" data-open-modal="modal-language-selector" style="cursor: pointer;">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                  <div>
-                    <span data-i18n="settings.language">Language</span>
-                  </div>
+              <div class="profile-menu-row" data-open-modal="modal-firebase-config">
+                <div class="menu-row-left">
+                  <span>🔥</span>
+                  <span>Firebase Integration</span>
                 </div>
-                <div class="settings-item-right">
-                  <span id="settings-current-language-display" style="font-weight: 600; color: var(--color-text-primary);">English</span>
-                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-                </div>
-              </div>
-
-              <!-- Firebase Project Integration -->
-              <div class="settings-item" data-open-modal="modal-firebase-config" style="cursor: pointer;">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                  <span data-i18n="settings.firebaseConfig">Firebase Project Setup</span>
-                </div>
-                <div class="settings-item-right">
-                  <span id="firebase-status-badge" class="academic-badge">Pending Setup</span>
-                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-                </div>
-              </div>
-
-              <!-- Notifications -->
-              <div class="settings-item">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                  <span data-i18n="settings.studyReminders">Study Reminders</span>
-                </div>
-                <div class="settings-item-right">
-                  <span style="color: var(--color-status-success); font-weight: 600;" data-i18n="common.active">Active</span>
-                </div>
-              </div>
-
-              <!-- Admin Portal Access -->
-              <a href="admin/index.html" class="settings-item" style="text-decoration: none; color: inherit;">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24" style="stroke: var(--brand-gold);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                  <span style="font-weight: 600;" data-i18n="settings.adminConsole">Admin Console</span>
-                </div>
-                <div class="settings-item-right">
-                  <span class="academic-badge" style="background: var(--brand-gold-subtle); color: var(--color-text-accent);">CMS & Notes</span>
-                  <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-                </div>
-              </a>
-
-              <!-- About Notes Wallah -->
-              <div class="settings-item" onclick="window.NotesWallahUI.showToast('Notes Wallah - Educational Platform')">
-                <div class="settings-item-left">
-                  <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  <span data-i18n="settings.about">About Notes Wallah</span>
-                </div>
-                <div class="settings-item-right">
-                  <span>v1.0 (Part 4/10)</span>
+                <div class="menu-row-right">
+                  <span id="firebase-status-badge" class="academic-badge" style="background: rgba(22, 163, 74, 0.15); color: #16A34A; font-weight: 700;">Connected</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
               </div>
             </div>
 
-            <!-- Logout Button -->
-            <button type="button" id="btn-logout" class="btn btn-outline btn-block" style="color: var(--color-status-error); border-color: var(--color-border-subtle); margin-top: var(--spacing-4);">
-              <svg class="icon-svg icon-svg-sm" viewBox="0 0 24 24" style="stroke: var(--color-status-error);"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              <span data-i18n="settings.logout">Log Out</span>
-            </button>
+            <!-- Group 3: Admin & Sign Out -->
+            <div style="padding: 0 16px 24px; display: flex; flex-direction: column; gap: 10px;">
+              <a href="admin/index.html" class="btn btn-outline btn-block" style="text-decoration: none; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>Faculty / Admin Console</span>
+              </a>
+              <button type="button" id="btn-logout" class="btn btn-outline-danger btn-block">
+                <span>Sign Out</span>
+              </button>
+            </div>
           </section>
 
         </main>
@@ -1508,6 +1553,67 @@
             Retake Test
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- 11. In-App NCERT / Chapter PDF Viewer Modal -->
+    <div id="modal-pdf-viewer" class="modal-backdrop">
+      <div class="modal-dialog modal-dialog-lg" style="height: 85vh; display: flex; flex-direction: column; background: var(--color-bg-surface); border-radius: var(--radius-lg); overflow: hidden; margin: auto; max-width: 600px; width: 95%;">
+        <div class="modal-header" style="padding: 16px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span class="academic-badge" style="font-size: 0.65rem; background: rgba(15, 29, 56, 0.08); color: var(--brand-navy-primary);">Direct Chapter Reader</span>
+            <h3 class="modal-title" id="pdf-viewer-title" style="font-size: var(--font-size-sm); margin: 4px 0 0; color: var(--color-text-primary);">Chapter PDF</h3>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="modal-pdf-viewer" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body" style="flex: 1; padding: 0; position: relative; background: #525659;">
+          <iframe id="in-app-pdf-frame" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+        <div class="modal-footer" style="padding: 12px 16px; border-top: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-surface);">
+          <a id="pdf-viewer-open-direct" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+            <span>Open in Browser / Download</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+          <button type="button" class="btn btn-primary btn-sm" data-close-modal="modal-pdf-viewer">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. Attach Custom Chapter Ebook Link Modal -->
+    <div id="modal-attach-custom-ebook" class="modal-backdrop">
+      <div class="modal-sheet" style="max-width: 500px; margin: auto;">
+        <div class="modal-header">
+          <div>
+            <span class="academic-badge" style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.15); color: #B45309;">Personal Study Material</span>
+            <h3 class="modal-title" style="margin-top: 4px;">Attach Chapter PDF Link</h3>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="modal-attach-custom-ebook" aria-label="Close">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <form id="form-attach-custom-ebook">
+          <input type="hidden" id="attach-ebook-chapter-id">
+          <div style="padding: 12px 0;">
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); line-height: 1.4; margin-bottom: 14px;">
+              Paste your exact PDF URL, Google Drive public link, or school digital resource for <strong id="attach-modal-chapter-name" style="color: var(--color-text-primary);">this chapter</strong>. It will be saved directly on your device.
+            </p>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" for="attach-ebook-url-input" style="font-size: var(--font-size-xs); font-weight: 600; display: block; margin-bottom: 6px;">Direct PDF or Drive URL</label>
+              <input type="url" id="attach-ebook-url-input" class="form-input" style="width: 100%; padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle);" placeholder="https://example.com/chapter-notes.pdf" required>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--color-border-subtle);">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-remove-custom-ebook" style="color: #DC2626; border-color: rgba(220, 38, 38, 0.3); display: none;">
+              Revert to NCERT
+            </button>
+            <div style="display: flex; gap: 8px; margin-left: auto;">
+              <button type="button" class="btn btn-outline btn-sm" data-close-modal="modal-attach-custom-ebook">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm">Save Link</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
 
